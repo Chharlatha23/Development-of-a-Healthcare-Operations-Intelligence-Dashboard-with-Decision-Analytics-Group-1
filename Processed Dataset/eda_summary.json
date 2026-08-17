@@ -1,0 +1,64 @@
+{
+    "dataset_metrics": {
+        "total_records": 13069,
+        "total_departments": 20,
+        "total_revenue_inr": 864465918.0,
+        "total_insurance_cover_inr": 432894031.0,
+        "total_patient_paid_inr": 431571887.0,
+        "avg_length_of_stay_days": 11.96
+    },
+    "department_distribution": {
+        "Gynecology": 683,
+        "Orthopedics": 683,
+        "Pediatrics": 681,
+        "Nephrology": 680,
+        "Pulmonology": 672,
+        "Neurology": 669,
+        "Pathology": 668,
+        "Icu": 659,
+        "Endocrinology": 658,
+        "Emergency": 656,
+        "Gastroenterology": 656,
+        "Oncology": 653,
+        "Dermatology": 648,
+        "Ophthalmology": 644,
+        "Cardiology": 643,
+        "Psychiatry": 634,
+        "Urology": 632,
+        "General Medicine": 631,
+        "Ent": 613,
+        "Radiology": 606
+    },
+    "ward_distribution": {
+        "C": 3432,
+        "A": 3298,
+        "B": 3187,
+        "Icu": 3152
+    },
+    "room_type_distribution": {
+        "General": 4743,
+        "Private": 4503,
+        "ICU": 3823
+    },
+    "emergency_admission_ratio": {
+        "No": 6552,
+        "Yes": 6517
+    },
+    "payment_status_distribution": {
+        "Pending": 4378,
+        "Paid": 4367,
+        "Partial": 4324
+    },
+    "top_diagnoses": {
+        "Kidney Stone": 1133,
+        "Fracture": 1120,
+        "Asthma": 1109,
+        "Pneumonia": 1104,
+        "Diabetes": 1102,
+        "Cancer": 1101,
+        "Arthritis": 1095,
+        "COVID-19": 1085,
+        "Fever": 1072,
+        "Migraine": 1058
+    }
+}
