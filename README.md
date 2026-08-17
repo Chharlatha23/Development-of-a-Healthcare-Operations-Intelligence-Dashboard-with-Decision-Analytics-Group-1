@@ -1,40 +1,77 @@
 # Healthcare Operations Intelligence Dashboard with Decision Analytics
 
-Welcome to the repository for **Development of a Healthcare Operations Intelligence Dashboard with Decision Analytics (Group 1)**.
+Welcome to the official repository for **Development of a Healthcare Operations Intelligence Dashboard with Decision Analytics (Group 1)**.
 
 ## 📌 Project Overview
-This project presents an end-to-end Healthcare Operations Intelligence solution designed to streamline hospital administration, bed utilization, patient billing, clinical department performance, and operational decision analytics.
+This project presents an end-to-end Healthcare Operations Intelligence & Decision Analytics solution. It processes raw hospital admission logs, performs automated data cleaning and feature engineering, computes key performance metrics, and serves an interactive 5-page decision analytics dashboard built with **Streamlit** and **Plotly**.
 
-## 📊 Key Highlights & Dataset Analysis
-- **Total Records Analyzed:** 13,069 hospital admission records.
-- **Financial Volume:** ~₹864.5M in Total Billed Revenue with breakdown across Insurance Coverage (~₹432.9M) and Direct Out-of-Pocket Patient Payments (~₹431.6M).
-- **Core Operations Tracked:**
-  - Emergency vs. Elective Admissions (~50% Emergency).
-  - Departmental load across 20 distinct specialties (ICU, Cardiology, Neurology, Orthopedics, etc.).
-  - Ward & Room Type Distribution (General, Private, ICU).
-  - Payment Status Lifecycle (Paid, Partial, Pending).
-  - Patient Demographics & Length of Stay (LOS) Analytics.
+---
+
+## 🛠️ Step-by-Step Project Implementation
+
+### Step 1: Understand & Clean the Dataset (`scripts/data_cleaning.py`)
+- **Raw File:** `Raw Dataset/Admissions_filled.csv` (13,069 records, 52 columns).
+- **Actions Taken:**
+  - Removed duplicate/suffix columns (`.1`, `.2`).
+  - Standardized textual formatting across departments and wards.
+  - Parsed datetime fields (`Admission_Date`, `Discharge_Date`, `Test_Date`).
+  - Computed calculated features: `Length_of_Stay_Days`, `Insurance_Coverage_Pct`, and `Outstanding_Balance`.
+- **Output File:** `Processed Dataset/Admissions_cleaned.csv`.
+
+### Step 2 & 3: Exploratory Data Analysis & Operational KPIs (`scripts/eda_insights.py`)
+Key metrics computed from the dataset:
+- **Total Patients:** `13,069` unique patient admissions.
+- **Total Revenue Billed:** `₹864,465,918.00` (~₹864.5 Million).
+- **Insurance Coverage:** `₹432,894,031.00` (50.08% coverage ratio).
+- **Outstanding Dues:** Net pending patient payments analyzed across Payment Statuses (`Paid`, `Partial`, `Pending`).
+- **Average Length of Stay (LOS):** `11.96 days`.
+- **Emergency Admission Ratio:** `49.87%` emergency vs `50.13%` elective.
+- **Department Load:** 20 distinct departments led by Gynecology, Orthopedics, Pediatrics, Nephrology, and Pulmonology.
+
+### Step 4 & 5: Interactive 5-Page Dashboard (`app.py`)
+Built an interactive multi-page dashboard featuring Plotly dark-themed visualizations:
+1. **Executive Overview & KPIs:** Real-time metrics cards, department load bar chart, monthly admission trends.
+2. **Clinical & Bed Capacity:** Ward occupancy doughnut chart, room type distribution, average LOS by specialty.
+3. **Financial & Revenue Analytics:** Payment status breakdown, departmental revenue contribution, outstanding recovery.
+4. **Patient & Diagnostic Insights:** Top 10 clinical diagnoses, medication prescription demand, demographic age distribution.
+5. **Operational Decision Simulator:** Interactive slider tool allowing hospital executives to simulate Length of Stay (LOS) reduction scenarios and calculate potential bed-days saved & cost efficiencies.
+
+---
+
+## 🚀 How to Run the Project Locally
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/Chharlatha23/Development-of-a-Healthcare-Operations-Intelligence-Dashboard-with-Decision-Analytics-Group-1.git
+   cd "Development-of-a-Healthcare-Operations-Intelligence-Dashboard-with-Decision-Analytics-Group-1"
+   ```
+
+2. **Run Data Cleaning & EDA Pipelines:**
+   ```bash
+   python scripts/data_cleaning.py
+   python scripts/eda_insights.py
+   ```
+
+3. **Launch the Interactive Dashboard:**
+   ```bash
+   streamlit run app.py
+   ```
+
+---
 
 ## 📁 Repository Structure
 ```
+├── Processed Dataset/
+│   ├── Admissions_cleaned.csv     # Cleaned & feature-engineered dataset
+│   └── eda_insights.json          # Precomputed EDA insights summary
 ├── Raw Dataset/
-│   └── Admissions_filled.csv      # Complete primary dataset (13,069 records)
-├── README.md                      # Comprehensive project documentation
+│   └── Admissions_filled.csv      # Original raw dataset
+├── scripts/
+│   ├── data_cleaning.py           # Automated cleaning pipeline
+│   └── eda_insights.py            # EDA calculation script
+├── app.py                         # Interactive Streamlit & Plotly Dashboard
+└── README.md                      # Complete project guide and documentation
 ```
 
-## 🎯 Key Operational Metrics & Insights
-1. **Bed & Capacity Management:** Tracks room occupancy across General, Private, and ICU wards to optimize bed turnaround times.
-2. **Financial Intelligence:** Analyzes total billing, insurance claim settlement ratios, and outstanding pending balances.
-3. **Clinical Operations:** Monitors departmental admission loads, average length of stay, doctor experience, and lab testing costs.
-4. **Decision Analytics:** Interactive dashboard architecture supporting operational decision-making for hospital executives and department heads.
-
-## 🚀 How to Run & Contribute
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/Chharlatha23/Development-of-a-Healthcare-Operations-Intelligence-Dashboard-with-Decision-Analytics-Group-1.git
-   ```
-2. Explore dataset:
-   - File located under `Raw Dataset/Admissions_filled.csv`.
-
 ---
-*Developed by Group 1 for Infosys Healthcare Operations Project.*
+*Developed by Group 1 for Infosys Healthcare Operations Intelligence Project.*
