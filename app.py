@@ -13,7 +13,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Professional Clean Hospital Theme CSS (WCAG Accessible, High Contrast Light Theme)
+# Professional Clean Hospital Theme CSS (WCAG Accessible, Compact & High Contrast Light Theme)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -30,21 +30,21 @@ st.markdown("""
 
     /* Reduce Wasted White Space at Top */
     .block-container {
-        padding-top: 1.5rem !important;
-        padding-bottom: 2rem !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
+        padding-top: 1.2rem !important;
+        padding-bottom: 1.5rem !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
         max-width: 100% !important;
     }
 
     /* Clean Enterprise Hospital Header */
     .hospital-header-card {
         background-color: #ffffff;
-        border-radius: 12px;
-        padding: 18px 24px;
+        border-radius: 10px;
+        padding: 14px 20px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-        margin-bottom: 20px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+        margin-bottom: 15px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -52,19 +52,19 @@ st.markdown("""
 
     .hospital-header-title {
         color: #0f172a;
-        font-size: 24px;
+        font-size: 22px;
         font-weight: 700;
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 8px;
     }
 
     .hospital-header-subtitle {
         color: #475569;
         font-size: 13px;
         font-weight: 500;
-        margin-top: 4px;
+        margin-top: 2px;
     }
 
     .status-badge-live {
@@ -87,21 +87,20 @@ st.markdown("""
         border-radius: 50%;
     }
 
-    /* Clean White KPI Metric Cards */
+    /* Compact White KPI Metric Cards */
     .hospital-kpi-card {
         background-color: #ffffff;
-        border-radius: 12px;
-        padding: 16px 20px;
+        border-radius: 10px;
+        padding: 12px 16px;
         border: 1px solid #e2e8f0;
         border-left: 4px solid #0284c7; /* Primary Medical Blue */
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
         transition: transform 0.15s ease, box-shadow 0.15s ease;
-        height: 100%;
     }
 
     .hospital-kpi-card:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
+        box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.05);
     }
 
     .hospital-kpi-card-rose {
@@ -122,14 +121,14 @@ st.markdown("""
         color: #475569;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 4px;
+        margin-bottom: 2px;
     }
 
     .kpi-card-value {
-        font-size: 26px;
+        font-size: 24px;
         font-weight: 800;
         color: #0f172a;
-        line-height: 1.2;
+        line-height: 1.1;
     }
 
     .kpi-card-value-rose {
@@ -137,34 +136,71 @@ st.markdown("""
     }
 
     .kpi-card-sub {
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 500;
         color: #64748b;
-        margin-top: 4px;
+        margin-top: 2px;
     }
 
     /* White Section Card Containers for Charts */
     .chart-container-card {
         background-color: #ffffff;
-        border-radius: 12px;
-        padding: 20px;
+        border-radius: 10px;
+        padding: 16px 20px;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
-        margin-bottom: 20px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+        margin-bottom: 16px;
     }
 
     .chart-card-title {
-        font-size: 16px;
+        font-size: 15px;
         font-weight: 700;
         color: #0f172a;
-        margin-bottom: 14px;
+        margin-bottom: 10px;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
 
-    /* Clean Sidebar Styling */
+    /* Key Insights Container */
+    .insights-card {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 16px 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.03);
+        margin-top: 5px;
+        margin-bottom: 15px;
+    }
+
+    .insight-item {
+        background-color: #f8fafc;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .insight-title {
+        font-size: 12px;
+        font-weight: 600;
+        color: #475569;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .insight-val {
+        font-size: 15px;
+        font-weight: 700;
+        color: #0284c7;
+    }
+
+    /* Slightly Reduce Sidebar Width */
     section[data-testid="stSidebar"] {
+        width: 275px !important;
         background-color: #ffffff !important;
         border-right: 1px solid #e2e8f0 !important;
     }
@@ -172,17 +208,29 @@ st.markdown("""
     section[data-testid="stSidebar"] .stRadio label {
         color: #0f172a !important;
         font-weight: 500 !important;
-        font-size: 14px !important;
+        font-size: 13px !important;
+    }
+
+    /* Filter Status Pill */
+    .filter-status-pill {
+        background-color: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        margin-bottom: 14px;
+        display: inline-block;
     }
 
     /* High Contrast Text overrides for Filter elements */
     .stSelectbox label, .stMultiSelect label, .stSlider label {
         color: #0f172a !important;
         font-weight: 600 !important;
-        font-size: 13px !important;
+        font-size: 12px !important;
     }
     
-    /* Ensure Streamlit Widgets blend into light medical theme */
     div[data-baseweb="select"] > div {
         background-color: #ffffff !important;
         border-color: #cbd5e1 !important;
@@ -195,6 +243,7 @@ st.markdown("""
 
     hr {
         border-color: #e2e8f0 !important;
+        margin: 10px 0 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -234,12 +283,11 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR NAVIGATION & SINGLE-SOURCE ROUTING STATE ---
+# --- SIDEBAR NAVIGATION & ROUTING STATE ---
 st.sidebar.markdown("## 🏥 MediPulse")
 st.sidebar.markdown("**Hospital Analytics**")
 st.sidebar.markdown("---")
 
-# Defined single unified navigation list to prevent page collision or default falling
 NAV_OPTIONS = [
     "Executive Overview",
     "Bed Capacity & Ward Analytics",
@@ -310,8 +358,14 @@ PLOTLY_LIGHT_THEME = {
 
 # 1. EXECUTIVE OVERVIEW PAGE
 if selected_view == "Executive Overview":
-    st.markdown("### 📊 Executive Overview Dashboard")
-    
+    # Dynamic Filter Status Indicator
+    active_filters_count = len(dept_filter) + len(ward_filter) + (1 if emergency_filter != "All Statuses" else 0)
+    if active_filters_count > 0:
+        st.markdown(f'<div class="filter-status-pill">🔍 Active Filters: {active_filters_count} applied</div>', unsafe_allow_html=True)
+    else:
+        st.markdown('<div class="filter-status-pill" style="background-color:#f1f5f9; color:#475569; border-color:#e2e8f0;">Showing All Hospital Data</div>', unsafe_allow_html=True)
+
+    # 5 KPI METRIC CARDS ROW (Compact Vertical Padding)
     k1, k2, k3, k4, k5 = st.columns(5)
     with k1:
         st.markdown(f"""
@@ -333,7 +387,7 @@ if selected_view == "Executive Overview":
         st.markdown(f"""
             <div class="hospital-kpi-card">
                 <div class="kpi-card-label">Average Length of Stay</div>
-                <div class="kpi-card-value">{f_df['Length_of_Stay_Days'].mean():.1f} <span style="font-size:14px; font-weight:600;">Days</span></div>
+                <div class="kpi-card-value">{f_df['Length_of_Stay_Days'].mean():.1f} <span style="font-size:13px; font-weight:600;">Days</span></div>
                 <div class="kpi-card-sub">⏱️ Bed Turnaround Ratio</div>
             </div>
         """, unsafe_allow_html=True)
@@ -354,35 +408,100 @@ if selected_view == "Executive Overview":
             </div>
         """, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     
+    # CHARTS ROW (No Empty Boxes)
     col_left, col_right = st.columns([1.2, 1])
     with col_left:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='chart-card-title'><span>🏥 Department Admission Intake</span><span style='font-size:12px; color:#64748b;'>Top Specialties</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🏥 Department-wise Admission Volume</span><span style='font-size:12px; color:#64748b;'>Top Specialties</span></div>", unsafe_allow_html=True)
         dept_counts = f_df['Department'].value_counts().reset_index()
         dept_counts.columns = ['Department', 'Admissions']
+        top_dept = dept_counts.head(10)
+        
+        # Max value for xaxis range padding to avoid value cutoff
+        max_val = top_dept['Admissions'].max() if len(top_dept) > 0 else 100
+        
         fig_dept = px.bar(
-            dept_counts.head(10), x='Admissions', y='Department', orientation='h',
+            top_dept, x='Admissions', y='Department', orientation='h',
             color='Admissions', color_continuous_scale='Blues', text='Admissions'
         )
-        fig_dept.update_traces(textposition='outside', marker_line_color='#0284c7', marker_line_width=1)
-        fig_dept.update_layout(**PLOTLY_LIGHT_THEME, height=360, margin=dict(l=0, r=20, t=10, b=0))
+        fig_dept.update_traces(
+            textposition='outside',
+            cliponaxis=False,
+            marker_line_color='#0284c7',
+            marker_line_width=1
+        )
+        fig_dept.update_layout(
+            **PLOTLY_LIGHT_THEME,
+            height=340,
+            margin=dict(l=0, r=55, t=10, b=0),
+            xaxis=dict(range=[0, max_val * 1.15], gridcolor='#f1f5f9', tickfont={'color': '#475569'})
+        )
         st.plotly_chart(fig_dept, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with col_right:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='chart-card-title'><span>📈 Inpatient Monthly Flow</span><span style='font-size:12px; color:#64748b;'>Volume Trends</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>📈 Monthly Inpatient Admission Trend</span><span style='font-size:12px; color:#64748b;'>Volume Trends</span></div>", unsafe_allow_html=True)
         f_df['Month_Year'] = f_df['Admission_Date'].dt.to_period('M').astype(str)
         monthly_df = f_df.groupby('Month_Year')['Admission_ID'].count().reset_index()
         fig_monthly = px.area(
             monthly_df, x='Month_Year', y='Admission_ID',
             labels={'Admission_ID': 'Admissions'}, color_discrete_sequence=['#0284c7']
         )
-        fig_monthly.update_layout(**PLOTLY_LIGHT_THEME, height=360, margin=dict(l=0, r=10, t=10, b=0))
+        fig_monthly.update_layout(**PLOTLY_LIGHT_THEME, height=340, margin=dict(l=0, r=10, t=10, b=0))
         st.plotly_chart(fig_monthly, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
+
+    # 5. DYNAMIC KEY INSIGHTS SECTION (Calculated from Dataset)
+    top_dept_name = dept_counts.iloc[0]['Department'] if len(dept_counts) > 0 else "N/A"
+    avg_monthly_adm = round(monthly_df['Admission_ID'].mean(), 1) if len(monthly_df) > 0 else 0
+    er_rate_val = (f_df['Emergency'].value_counts().get('Yes', 0)/len(f_df)*100 if len(f_df)>0 else 0)
+    avg_los_val = f_df['Length_of_Stay_Days'].mean() if len(f_df)>0 else 0
+    top_rev_dept = f_df.groupby('Department')['Total_Amount'].sum().idxmax() if len(f_df)>0 else "N/A"
+
+    st.markdown("<div class='insights-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title' style='margin-bottom:12px;'><span>💡 Key Insights</span></div>", unsafe_allow_html=True)
+    
+    i1, i2, i3, i4, i5 = st.columns(5)
+    with i1:
+        st.markdown(f"""
+            <div class="insight-item">
+                <div class="insight-title">🏥 Top Department</div>
+                <div class="insight-val">{top_dept_name}</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with i2:
+        st.markdown(f"""
+            <div class="insight-item">
+                <div class="insight-title">📊 Avg Monthly Admissions</div>
+                <div class="insight-val">{avg_monthly_adm:,.0f}</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with i3:
+        st.markdown(f"""
+            <div class="insight-item">
+                <div class="insight-title">🚑 Critical ER Rate</div>
+                <div class="insight-val">{er_rate_val:.1f}%</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with i4:
+        st.markdown(f"""
+            <div class="insight-item">
+                <div class="insight-title">🛏️ Average Stay</div>
+                <div class="insight-val">{avg_los_val:.1f} Days</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with i5:
+        st.markdown(f"""
+            <div class="insight-item">
+                <div class="insight-title">🏛️ Top Revenue Dept</div>
+                <div class="insight-val">{top_rev_dept}</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    st.markdown("</div>", unsafe_allow_html=True)
 
 # 2. BED CAPACITY & WARD ANALYTICS PAGE
 elif selected_view == "Bed Capacity & Ward Analytics":
