@@ -435,9 +435,9 @@ if selected_view == "Executive Overview":
         fig_dept.update_layout(
             **PLOTLY_LIGHT_THEME,
             height=340,
-            margin=dict(l=0, r=55, t=10, b=0),
-            xaxis=dict(range=[0, max_val * 1.15], gridcolor='#f1f5f9', tickfont={'color': '#475569'})
+            margin=dict(l=0, r=55, t=10, b=0)
         )
+        fig_dept.update_xaxes(range=[0, max_val * 1.15], gridcolor='#f1f5f9', tickfont={'color': '#475569'})
         st.plotly_chart(fig_dept, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
