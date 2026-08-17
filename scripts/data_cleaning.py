@@ -13,11 +13,7 @@ def clean_data():
     print(f"Loading raw dataset from {raw_path}...")
     df = pd.read_csv(raw_path)
     
-    initial_shape = df.shape
-    print(f"Initial shape: {initial_shape}")
-    
     # 1. Clean Column Names (remove suffix duplicate columns like .1, .2)
-    # Deduplicate columns by keeping primary domain columns and renaming appropriately
     df_cleaned = df.loc[:, ~df.columns.str.contains(r'\.\d+$')].copy()
     
     # Clean text columns formatting
@@ -42,17 +38,29 @@ def clean_data():
     # Calculate Length of Stay (LOS) in days
     if 'Admission_Date' in df_cleaned.columns and 'Discharge_Date' in df_cleaned.columns:
         df_cleaned['Length_of_Stay_Days'] = (df_cleaned['Discharge_Date'] - df_cleaned['Admission_Date']).dt.days
-        # Fill any missing/negative values with default 1 day
         df_cleaned['Length_of_Stay_Days'] = df_cleaned['Length_of_Stay_Days'].apply(lambda x: x if x > 0 else 1)
         
     # 3. Financial Derivations & Calculations
     if 'Total_Amount' in df_cleaned.columns and 'Insurance_Cover' in df_cleaned.columns:
         df_cleaned['Insurance_Coverage_Pct'] = (df_cleaned['Insurance_Cover'] / df_cleaned['Total_Amount'] * 100).round(2)
         
-    if 'Total_Amount' in df_cleaned.columns and 'Insurance_Cover' in df_cleaned.columns and 'Patient_Paid' in df_cleaned.columns:
-        df_cleaned['Outstanding_Balance'] = (df_cleaned['Total_Amount'] - df_cleaned['Insurance_Cover'] - df_cleaned['Patient_Paid']).round(2)
-        # Outstanding balances less than 0 clipped to 0
-        df_cleaned['Outstanding_Balance'] = df_cleaned['Outstanding_Balance'].apply(lambda x: max(0.0, x))
+    # Calculate Pending Dues based on Payment Status:
+    # If Payment_Status is 'Pending' or 'Partial', calculate uncollected dues based on Patient_Paid
+    if 'Total_Amount' in df_cleaned.columns and 'Patient_Paid' in df_cleaned.columns and 'Insurance_Cover' in df_cleaned.columns and 'Payment_Status' in df_cleaned.columns:
+        # Net Out-of-pocket required from patient = Total_Amount - Insurance_Cover
+        df_cleaned['Patient_Due_Amount'] = df_cleaned['Total_Amount'] - df_cleaned['Insurance_Cover']
+        
+        # Calculate actual uncollected balance for Pending / Partial accounts
+        def calc_uncollected(row):
+            if row['Payment_Status'] == 'Paid':
+                return 0.0
+            elif row['Payment_Status'] == 'Pending':
+                return max(0.0, float(row['Patient_Due_Amount']))
+            elif row['Payment_Status'] == 'Partial':
+                return max(0.0, float(row['Patient_Due_Amount'] - row['Patient_Paid']))
+            return 0.0
+            
+        df_cleaned['Outstanding_Balance'] = df_cleaned.apply(calc_uncollected, axis=1).round(2)
         
     # 4. Save processed dataset
     os.makedirs(processed_dir, exist_ok=True)

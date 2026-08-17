@@ -18,7 +18,6 @@ st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
-    /* Base Font & Page Reset */
     html, body, [class*="css"] {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
@@ -67,7 +66,7 @@ st.markdown("""
         margin-top: 2px;
     }
 
-    .status-badge-live {
+    .status-badge-active {
         background-color: #f0fdf4;
         color: #166534;
         border: 1px solid #bbf7d0;
@@ -177,7 +176,7 @@ st.markdown("""
         background-color: #f8fafc;
         border: 1px solid #cbd5e1;
         border-radius: 8px;
-        padding: 12px 16px;
+        padding: 10px 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -193,7 +192,7 @@ st.markdown("""
     }
 
     .insight-val {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 700;
         color: #0284c7;
     }
@@ -264,7 +263,7 @@ if df is None:
     st.error("⚠️ Hospital Clinical Dataset Not Found! Please verify data pipeline.")
     st.stop()
 
-# --- PROFESSIONAL CLEAN HOSPITAL HEADER ---
+# --- PROFESSIONAL CLEAN HOSPITAL HEADER (NO FAKE REAL-TIME CLAIMS) ---
 st.markdown("""
     <div class="hospital-header-card">
         <div>
@@ -276,8 +275,8 @@ st.markdown("""
             </div>
         </div>
         <div>
-            <span class="status-badge-live">
-                <span class="status-dot-green"></span> Hospital Operations: Live
+            <span class="status-badge-active">
+                <span class="status-dot-green"></span> Analytics Dashboard: Active
             </span>
         </div>
     </div>
@@ -354,17 +353,19 @@ PLOTLY_LIGHT_THEME = {
     'yaxis': {'gridcolor': '#f1f5f9', 'zerolinecolor': '#e2e8f0', 'tickfont': {'color': '#475569'}}
 }
 
-# --- PAGE ROUTING CONTROLLER ---
+# --- DYNAMIC ACTIVE FILTER STATUS PILL ---
+active_filters_count = len(dept_filter) + len(ward_filter) + (1 if emergency_filter != "All Statuses" else 0)
+if active_filters_count > 0:
+    st.markdown(f'<div class="filter-status-pill">🔍 Active Filters: {active_filters_count} applied</div>', unsafe_allow_html=True)
+else:
+    st.markdown('<div class="filter-status-pill" style="background-color:#f1f5f9; color:#475569; border-color:#e2e8f0;">Showing All Hospital Data</div>', unsafe_allow_html=True)
 
-# 1. EXECUTIVE OVERVIEW PAGE
+# ==========================================
+# 1. EXECUTIVE OVERVIEW DASHBOARD
+# ==========================================
 if selected_view == "Executive Overview":
-    # Dynamic Filter Status Indicator
-    active_filters_count = len(dept_filter) + len(ward_filter) + (1 if emergency_filter != "All Statuses" else 0)
-    if active_filters_count > 0:
-        st.markdown(f'<div class="filter-status-pill">🔍 Active Filters: {active_filters_count} applied</div>', unsafe_allow_html=True)
-    else:
-        st.markdown('<div class="filter-status-pill" style="background-color:#f1f5f9; color:#475569; border-color:#e2e8f0;">Showing All Hospital Data</div>', unsafe_allow_html=True)
-
+    st.markdown("### Executive Overview Dashboard")
+    
     # 5 KPI METRIC CARDS ROW (Compact Vertical Padding)
     k1, k2, k3, k4, k5 = st.columns(5)
     with k1:
@@ -404,13 +405,13 @@ if selected_view == "Executive Overview":
             <div class="hospital-kpi-card hospital-kpi-card-amber">
                 <div class="kpi-card-label">Pending Recovery</div>
                 <div class="kpi-card-value">₹{f_df['Outstanding_Balance'].sum()/1e6:.1f}M</div>
-                <div class="kpi-card-sub">⚠️ Uncollected Balances</div>
+                <div class="kpi-card-sub">⚠️ Uncollected Dues</div>
             </div>
         """, unsafe_allow_html=True)
 
     st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     
-    # CHARTS ROW (No Empty Boxes)
+    # CHARTS ROW (No Empty Placeholder Boxes)
     col_left, col_right = st.columns([1.2, 1])
     with col_left:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
@@ -419,7 +420,6 @@ if selected_view == "Executive Overview":
         dept_counts.columns = ['Department', 'Admissions']
         top_dept = dept_counts.head(10)
         
-        # Max value for xaxis range padding to avoid value cutoff
         max_val = top_dept['Admissions'].max() if len(top_dept) > 0 else 100
         
         fig_dept = px.bar(
@@ -445,24 +445,27 @@ if selected_view == "Executive Overview":
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
         st.markdown("<div class='chart-card-title'><span>📈 Monthly Inpatient Admission Trend</span><span style='font-size:12px; color:#64748b;'>Volume Trends</span></div>", unsafe_allow_html=True)
         f_df['Month_Year'] = f_df['Admission_Date'].dt.to_period('M').astype(str)
-        monthly_df = f_df.groupby('Month_Year')['Admission_ID'].count().reset_index()
+        
+        # Exclude incomplete final month (2026-06) for accurate trend representation
+        complete_monthly_df = f_df[f_df['Month_Year'] != '2026-06'].groupby('Month_Year')['Admission_ID'].count().reset_index()
+        
         fig_monthly = px.area(
-            monthly_df, x='Month_Year', y='Admission_ID',
+            complete_monthly_df, x='Month_Year', y='Admission_ID',
             labels={'Admission_ID': 'Admissions'}, color_discrete_sequence=['#0284c7']
         )
         fig_monthly.update_layout(**PLOTLY_LIGHT_THEME, height=340, margin=dict(l=0, r=10, t=10, b=0))
         st.plotly_chart(fig_monthly, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # 5. DYNAMIC KEY INSIGHTS SECTION (Calculated from Dataset)
+    # DYNAMIC KEY INSIGHTS SECTION
     top_dept_name = dept_counts.iloc[0]['Department'] if len(dept_counts) > 0 else "N/A"
-    avg_monthly_adm = round(monthly_df['Admission_ID'].mean(), 1) if len(monthly_df) > 0 else 0
+    avg_monthly_adm = round(complete_monthly_df['Admission_ID'].mean(), 1) if len(complete_monthly_df) > 0 else 0
     er_rate_val = (f_df['Emergency'].value_counts().get('Yes', 0)/len(f_df)*100 if len(f_df)>0 else 0)
     avg_los_val = f_df['Length_of_Stay_Days'].mean() if len(f_df)>0 else 0
     top_rev_dept = f_df.groupby('Department')['Total_Amount'].sum().idxmax() if len(f_df)>0 else "N/A"
 
     st.markdown("<div class='insights-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='chart-card-title' style='margin-bottom:12px;'><span>💡 Key Insights</span></div>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title' style='margin-bottom:10px;'><span>💡 Key Executive Insights</span></div>", unsafe_allow_html=True)
     
     i1, i2, i3, i4, i5 = st.columns(5)
     with i1:
@@ -503,9 +506,62 @@ if selected_view == "Executive Overview":
         
     st.markdown("</div>", unsafe_allow_html=True)
 
-# 2. BED CAPACITY & WARD ANALYTICS PAGE
+# ==========================================
+# 2. BED CAPACITY & WARD ANALYTICS DASHBOARD
+# ==========================================
 elif selected_view == "Bed Capacity & Ward Analytics":
-    st.markdown("### 🛏️ Bed Capacity & Ward Analytics Dashboard")
+    st.markdown("### Bed Capacity & Ward Analytics Dashboard")
+    
+    # Dynamic KPI Summary Row
+    total_beds = f_df['Bed_ID'].nunique() if 'Bed_ID' in f_df.columns else len(f_df)
+    top_ward = f_df['Ward'].value_counts().idxmax() if len(f_df) > 0 else "N/A"
+    icu_count = len(f_df[f_df['Ward'] == 'Icu'])
+    top_room = f_df['Room_Type'].value_counts().idxmax() if len(f_df) > 0 else "N/A"
+    avg_ward_los = f_df['Length_of_Stay_Days'].mean() if len(f_df) > 0 else 0
+    
+    b1, b2, b3, b4, b5 = st.columns(5)
+    with b1:
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Active Tracked Beds</div>
+                <div class="kpi-card-value">{total_beds:,}</div>
+                <div class="kpi-card-sub">🛏️ Unique Bed IDs</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with b2:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-teal">
+                <div class="kpi-card-label">Highest Occupancy Ward</div>
+                <div class="kpi-card-value">{top_ward}</div>
+                <div class="kpi-card-sub">🏨 Peak Patient Load</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with b3:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-rose">
+                <div class="kpi-card-label">ICU Ward Cases</div>
+                <div class="kpi-card-value kpi-card-value-rose">{icu_count:,}</div>
+                <div class="kpi-card-sub">🚨 Intensive Care Occupancy</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with b4:
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Most Utilized Room</div>
+                <div class="kpi-card-value">{top_room}</div>
+                <div class="kpi-card-sub">🚪 Preference Split</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with b5:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-amber">
+                <div class="kpi-card-label">Average Bed Stay</div>
+                <div class="kpi-card-value">{avg_ward_los:.1f} Days</div>
+                <div class="kpi-card-sub">⏱️ Inpatient Duration</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
     
     col1, col2 = st.columns(2)
     with col1:
@@ -538,33 +594,80 @@ elif selected_view == "Bed Capacity & Ward Analytics":
     st.markdown("<div class='chart-card-title'><span>🔥 Department vs. Ward Occupancy Matrix (Heatmap)</span></div>", unsafe_allow_html=True)
     heatmap_data = pd.crosstab(f_df['Department'], f_df['Ward'])
     fig_heat = px.imshow(heatmap_data, text_auto=True, aspect="auto", color_continuous_scale="Blues")
-    fig_heat.update_layout(**PLOTLY_LIGHT_THEME, height=400)
+    fig_heat.update_layout(**PLOTLY_LIGHT_THEME, height=380)
     st.plotly_chart(fig_heat, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# 3. PATIENT FLOW PAGE
+    # Dynamic Key Insights Section
+    st.markdown("<div class='insights-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title' style='margin-bottom:10px;'><span>💡 Key Capacity Insights</span></div>", unsafe_allow_html=True)
+    i1, i2, i3, i4 = st.columns(4)
+    with i1:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🏨 Highest Ward Volume</div><div class="insight-val">{top_ward}</div></div>', unsafe_allow_html=True)
+    with i2:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🚨 Intensive Care Occupants</div><div class="insight-val">{icu_count:,}</div></div>', unsafe_allow_html=True)
+    with i3:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🚪 Primary Accommodation</div><div class="insight-val">{top_room}</div></div>', unsafe_allow_html=True)
+    with i4:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">⏱️ Average Ward Stay</div><div class="insight-val">{avg_ward_los:.1f} Days</div></div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ==========================================
+# 3. PATIENT FLOW DASHBOARD
+# ==========================================
 elif selected_view == "Patient Flow":
-    st.markdown("### 🔄 Patient Flow Dashboard")
+    st.markdown("### Patient Flow Dashboard")
+    
+    f_df['Month_Year'] = f_df['Admission_Date'].dt.to_period('M').astype(str)
+    complete_monthly = f_df[f_df['Month_Year'] != '2026-06']
+    
+    avg_monthly = round(complete_monthly.groupby('Month_Year')['Admission_ID'].count().mean(), 1) if len(complete_monthly) > 0 else 0
+    top_flow_dept = f_df['Department'].value_counts().idxmax() if len(f_df) > 0 else "N/A"
+    avg_daily_intake = round(len(complete_monthly) / max(1, complete_monthly['Month_Year'].nunique() * 30), 1)
     
     p1, p2, p3, p4 = st.columns(4)
     with p1:
-        st.metric("Total Admissions", f"{len(f_df):,}")
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Total Inpatient Admissions</div>
+                <div class="kpi-card-value">{len(f_df):,}</div>
+                <div class="kpi-card-sub">👥 Registered Intake</div>
+            </div>
+        """, unsafe_allow_html=True)
     with p2:
-        st.metric("Avg Length of Stay", f"{f_df['Length_of_Stay_Days'].mean():.1f} Days")
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-teal">
+                <div class="kpi-card-label">Average Length of Stay</div>
+                <div class="kpi-card-value">{f_df['Length_of_Stay_Days'].mean():.1f} Days</div>
+                <div class="kpi-card-sub">⏱️ Turnaround Duration</div>
+            </div>
+        """, unsafe_allow_html=True)
     with p3:
-        st.metric("Daily Avg Intake", f"{round(len(f_df)/max(1, f_df['Admission_Date'].dt.to_period('M').nunique()*30), 1)} / Day")
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Daily Average Intake</div>
+                <div class="kpi-card-value">{avg_daily_intake} / Day</div>
+                <div class="kpi-card-sub">📈 Daily Flow Rate</div>
+            </div>
+        """, unsafe_allow_html=True)
     with p4:
-        st.metric("Discharge Completion", f"{f_df['Discharge_Date'].notnull().sum():,}")
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-amber">
+                <div class="kpi-card-label">Average Monthly Intake</div>
+                <div class="kpi-card-value">{avg_monthly:,.0f}</div>
+                <div class="kpi-card-sub">📊 Monthly Patient Volume</div>
+            </div>
+        """, unsafe_allow_html=True)
         
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='chart-card-title'><span>📈 Patient Volume Flow Over Time</span></div>", unsafe_allow_html=True)
-        f_df['Month_Year'] = f_df['Admission_Date'].dt.to_period('M').astype(str)
-        monthly_df = f_df.groupby('Month_Year')['Admission_ID'].count().reset_index()
-        fig_flow = px.line(monthly_df, x='Month_Year', y='Admission_ID', markers=True, color_discrete_sequence=['#0284c7'])
-        fig_flow.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        st.markdown("<div class='chart-card-title'><span>📈 Patient Volume Flow Over Time</span><span style='font-size:11px; color:#64748b;'>Complete Months</span></div>", unsafe_allow_html=True)
+        monthly_flow_df = complete_monthly.groupby('Month_Year')['Admission_ID'].count().reset_index()
+        fig_flow = px.line(monthly_flow_df, x='Month_Year', y='Admission_ID', markers=True, color_discrete_sequence=['#0284c7'])
+        fig_flow.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_flow, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -574,23 +677,81 @@ elif selected_view == "Patient Flow":
         dept_counts = f_df['Department'].value_counts().head(10).reset_index()
         dept_counts.columns = ['Department', 'Count']
         fig_dept_flow = px.bar(dept_counts, x='Count', y='Department', orientation='h', color='Count', color_continuous_scale='Teal')
-        fig_dept_flow.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        fig_dept_flow.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_dept_flow, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 4. REVENUE & DUES PAGE
-elif selected_view == "Revenue & Dues":
-    st.markdown("### 💰 Financial Revenue Cycle & Dues Recovery Dashboard")
-    
-    f1, f2, f3 = st.columns(3)
-    with f1:
-        st.metric("Gross Billed Revenue", f"₹{f_df['Total_Amount'].sum():,.2f}")
-    with f2:
-        st.metric("Insurance Covered Claims", f"₹{f_df['Insurance_Cover'].sum():,.2f}")
-    with f3:
-        st.metric("Net Pending Dues", f"₹{f_df['Outstanding_Balance'].sum():,.2f}")
+    # Dynamic Key Insights
+    st.markdown("<div class='insights-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title' style='margin-bottom:10px;'><span>💡 Key Patient Flow Insights</span></div>", unsafe_allow_html=True)
+    i1, i2, i3, i4 = st.columns(4)
+    with i1:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🏥 Highest Admission Dept</div><div class="insight-val">{top_flow_dept}</div></div>', unsafe_allow_html=True)
+    with i2:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">📊 Avg Monthly Admissions</div><div class="insight-val">{avg_monthly:,.0f}</div></div>', unsafe_allow_html=True)
+    with i3:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">📈 Avg Daily Patient Intake</div><div class="insight-val">{avg_daily_intake} / Day</div></div>', unsafe_allow_html=True)
+    with i4:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🛏️ Avg Length of Stay</div><div class="insight-val">{f_df["Length_of_Stay_Days"].mean():.1f} Days</div></div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+# ==========================================
+# 4. FINANCIAL REVENUE CYCLE & DUES DASHBOARD
+# ==========================================
+elif selected_view == "Revenue & Dues":
+    st.markdown("### Financial Revenue Cycle & Dues Recovery Dashboard")
+    
+    total_rev = f_df['Total_Amount'].sum() if len(f_df) > 0 else 0
+    ins_cover = f_df['Insurance_Cover'].sum() if len(f_df) > 0 else 0
+    patient_paid = f_df['Patient_Paid'].sum() if len(f_df) > 0 else 0
+    pending_dues = f_df['Outstanding_Balance'].sum() if len(f_df) > 0 else 0
+    settlement_rate = ((ins_cover + patient_paid) / max(1, total_rev) * 100)
+    top_rev_dept = f_df.groupby('Department')['Total_Amount'].sum().idxmax() if len(f_df) > 0 else "N/A"
+    
+    f1, f2, f3, f4, f5 = st.columns(5)
+    with f1:
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Gross Billed Revenue</div>
+                <div class="kpi-card-value">₹{total_rev/1e6:.1f}M</div>
+                <div class="kpi-card-sub">💳 Gross Patient Claims</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with f2:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-teal">
+                <div class="kpi-card-label">Insurance Covered</div>
+                <div class="kpi-card-value">₹{ins_cover/1e6:.1f}M</div>
+                <div class="kpi-card-sub">🏛️ Claim Coverage Amount</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with f3:
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Patient Paid Amount</div>
+                <div class="kpi-card-value">₹{patient_paid/1e6:.1f}M</div>
+                <div class="kpi-card-sub">💵 Out-of-Pocket Payments</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with f4:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-amber">
+                <div class="kpi-card-label">Net Pending Dues</div>
+                <div class="kpi-card-value">₹{pending_dues/1e6:.1f}M</div>
+                <div class="kpi-card-sub">⚠️ Outstanding Balances</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with f5:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-teal">
+                <div class="kpi-card-label">Claim Settlement Rate</div>
+                <div class="kpi-card-value">{settlement_rate:.1f}%</div>
+                <div class="kpi-card-sub">✅ Revenue Recovery Ratio</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
@@ -601,7 +762,7 @@ elif selected_view == "Revenue & Dues":
             pay_df, values='Count', names='Status', color='Status',
             color_discrete_map={'Paid': '#16a34a', 'Partial': '#d97706', 'Pending': '#dc2626'}
         )
-        fig_pay.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        fig_pay.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_pay, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -613,16 +774,82 @@ elif selected_view == "Revenue & Dues":
             rev_dept.head(10), x='Total_Amount', y='Department', orientation='h',
             color='Total_Amount', color_continuous_scale='Blues'
         )
-        fig_rev.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        fig_rev.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_rev, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 5. DIAGNOSTIC LABS & PHARMACY PAGE
+    # Key Insights Section
+    st.markdown("<div class='insights-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title' style='margin-bottom:10px;'><span>💡 Key Financial Insights</span></div>", unsafe_allow_html=True)
+    i1, i2, i3, i4 = st.columns(4)
+    with i1:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🏛️ Top Revenue Department</div><div class="insight-val">{top_rev_dept}</div></div>', unsafe_allow_html=True)
+    with i2:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">💳 Gross Billed Volume</div><div class="insight-val">₹{total_rev/1e6:.1f}M</div></div>', unsafe_allow_html=True)
+    with i3:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">✅ Revenue Settlement Rate</div><div class="insight-val">{settlement_rate:.1f}%</div></div>', unsafe_allow_html=True)
+    with i4:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">⚠️ Outstanding Dues</div><div class="insight-val">₹{pending_dues/1e6:.1f}M</div></div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ==========================================
+# 5. DIAGNOSTIC LABS & PHARMACY DASHBOARD
+# ==========================================
 elif selected_view == "Diagnostic Labs & Pharmacy":
-    st.markdown("### 🧪 Diagnostic Labs & Pharmacy Dashboard")
+    st.markdown("### Diagnostic Labs & Pharmacy Dashboard")
     
-    d1, d2 = st.columns(2)
+    total_diag_records = len(f_df['Diagnosis'].dropna())
+    unique_diagnoses = f_df['Diagnosis'].nunique()
+    total_prescriptions = len(f_df['Medicine'].dropna())
+    top_diag = f_df['Diagnosis'].value_counts().idxmax() if len(f_df) > 0 else "N/A"
+    top_med = f_df['Medicine'].value_counts().idxmax() if len(f_df) > 0 else "N/A"
+    
+    d1, d2, d3, d4, d5 = st.columns(5)
     with d1:
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Diagnostic Records</div>
+                <div class="kpi-card-value">{total_diag_records:,}</div>
+                <div class="kpi-card-sub">📋 Total Pathology Tests</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with d2:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-teal">
+                <div class="kpi-card-label">Unique Diagnoses</div>
+                <div class="kpi-card-value">{unique_diagnoses:,}</div>
+                <div class="kpi-card-sub">🧪 Identified Conditions</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with d3:
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Prescription Volume</div>
+                <div class="kpi-card-value">{total_prescriptions:,}</div>
+                <div class="kpi-card-sub">💊 Pharmacy Orders</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with d4:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-amber">
+                <div class="kpi-card-label">Top Diagnosis</div>
+                <div class="kpi-card-value" style="font-size:20px;">{top_diag}</div>
+                <div class="kpi-card-sub">📋 Most Prevalent Condition</div>
+            </div>
+        """, unsafe_allow_html=True)
+    with d5:
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-teal">
+                <div class="kpi-card-label">Top Medication</div>
+                <div class="kpi-card-value" style="font-size:20px;">{top_med}</div>
+                <div class="kpi-card-sub">💊 Highest Dispensed Drug</div>
+            </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    
+    c1, c2 = st.columns(2)
+    with c1:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
         st.markdown("<div class='chart-card-title'><span>📋 Top 10 Clinical Diagnoses</span></div>", unsafe_allow_html=True)
         diag_df = f_df['Diagnosis'].value_counts().head(10).reset_index()
@@ -631,11 +858,11 @@ elif selected_view == "Diagnostic Labs & Pharmacy":
             diag_df, x='Count', y='Diagnosis', orientation='h', color='Count',
             color_continuous_scale='Blues'
         )
-        fig_diag.update_layout(**PLOTLY_LIGHT_THEME, height=360)
+        fig_diag.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_diag, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with d2:
+    with c2:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
         st.markdown("<div class='chart-card-title'><span>💊 Top Prescribed Medications</span></div>", unsafe_allow_html=True)
         med_df = f_df['Medicine'].value_counts().head(10).reset_index()
@@ -644,27 +871,74 @@ elif selected_view == "Diagnostic Labs & Pharmacy":
             med_df, x='Count', y='Medicine', orientation='h', color='Count',
             color_continuous_scale='Teal'
         )
-        fig_med.update_layout(**PLOTLY_LIGHT_THEME, height=360)
+        fig_med.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_med, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 6. EMERGENCY ANALYTICS PAGE
+    # Dynamic Insights Section
+    st.markdown("<div class='insights-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title' style='margin-bottom:10px;'><span>💡 Clinical & Pharmacy Insights</span></div>", unsafe_allow_html=True)
+    i1, i2, i3, i4 = st.columns(4)
+    with i1:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">📋 Most Common Diagnosis</div><div class="insight-val">{top_diag}</div></div>', unsafe_allow_html=True)
+    with i2:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">💊 Most Prescribed Drug</div><div class="insight-val">{top_med}</div></div>', unsafe_allow_html=True)
+    with i3:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🧪 Unique Diagnoses Count</div><div class="insight-val">{unique_diagnoses:,}</div></div>', unsafe_allow_html=True)
+    with i4:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">💊 Total Pharmacy Orders</div><div class="insight-val">{total_prescriptions:,}</div></div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ==========================================
+# 6. EMERGENCY ANALYTICS DASHBOARD
+# ==========================================
 elif selected_view == "Emergency Analytics":
-    st.markdown("### 🚨 Emergency Analytics Dashboard")
+    st.markdown("### Emergency Analytics Dashboard")
     
     er_df = f_df[f_df['Emergency'] == 'Yes']
+    total_er = len(er_df)
+    er_ratio = (total_er / max(1, len(f_df)) * 100)
+    avg_er_los = er_df['Length_of_Stay_Days'].mean() if total_er > 0 else 0
+    er_icu_cases = len(er_df[er_df['Ward'] == 'Icu'])
+    top_er_dept = er_df['Department'].value_counts().idxmax() if total_er > 0 else "N/A"
+    top_er_ward = er_df['Ward'].value_counts().idxmax() if total_er > 0 else "N/A"
     
     e1, e2, e3, e4 = st.columns(4)
     with e1:
-        st.metric("Total Emergency Cases", f"{len(er_df):,}")
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-rose">
+                <div class="kpi-card-label">Total Emergency Cases</div>
+                <div class="kpi-card-value kpi-card-value-rose">{total_er:,}</div>
+                <div class="kpi-card-sub">🚨 Critical Inpatient Volume</div>
+            </div>
+        """, unsafe_allow_html=True)
     with e2:
-        st.metric("Emergency Ratio", f"{(len(er_df)/max(1, len(f_df))*100):.1f}%")
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-rose">
+                <div class="kpi-card-label">Emergency Intake Ratio</div>
+                <div class="kpi-card-value kpi-card-value-rose">{er_ratio:.1f}%</div>
+                <div class="kpi-card-sub">🚑 Critical vs Elective Split</div>
+            </div>
+        """, unsafe_allow_html=True)
     with e3:
-        st.metric("Avg Emergency Stay", f"{er_df['Length_of_Stay_Days'].mean():.1f} Days")
+        st.markdown(f"""
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Average Emergency Stay</div>
+                <div class="kpi-card-value">{avg_er_los:.1f} Days</div>
+                <div class="kpi-card-sub">⏱️ Inpatient ER Turnaround</div>
+            </div>
+        """, unsafe_allow_html=True)
     with e4:
-        st.metric("Emergency ICU Cases", f"{len(er_df[er_df['Ward']=='Icu']):,}")
+        st.markdown(f"""
+            <div class="hospital-kpi-card hospital-kpi-card-amber">
+                <div class="kpi-card-label">Emergency ICU Cases</div>
+                <div class="kpi-card-value">{er_icu_cases:,}</div>
+                <div class="kpi-card-sub">🏥 Intensive Care Unit Intake</div>
+            </div>
+        """, unsafe_allow_html=True)
         
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height: 12px;'></div>", unsafe_allow_html=True)
+    
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
@@ -672,7 +946,7 @@ elif selected_view == "Emergency Analytics":
         er_dept = er_df['Department'].value_counts().head(10).reset_index()
         er_dept.columns = ['Department', 'Count']
         fig_er_dept = px.bar(er_dept, x='Count', y='Department', orientation='h', color='Count', color_continuous_scale='Reds')
-        fig_er_dept.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        fig_er_dept.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_er_dept, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
@@ -682,14 +956,30 @@ elif selected_view == "Emergency Analytics":
         er_ward = er_df['Ward'].value_counts().reset_index()
         er_ward.columns = ['Ward', 'Count']
         fig_er_ward = px.pie(er_ward, values='Count', names='Ward', hole=0.4, color_discrete_sequence=['#be123c', '#e11d48', '#fb7185'])
-        fig_er_ward.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        fig_er_ward.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_er_ward, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# 7. LENGTH-OF-STAY PREDICTION PAGE
+    # Dynamic Insights Section
+    st.markdown("<div class='insights-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title' style='margin-bottom:10px;'><span>💡 Emergency Care Insights</span></div>", unsafe_allow_html=True)
+    i1, i2, i3, i4 = st.columns(4)
+    with i1:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🚨 Highest ER Department</div><div class="insight-val">{top_er_dept}</div></div>', unsafe_allow_html=True)
+    with i2:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🚑 Critical Intake Rate</div><div class="insight-val">{er_ratio:.1f}%</div></div>', unsafe_allow_html=True)
+    with i3:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🏥 Emergency ICU Cases</div><div class="insight-val">{er_icu_cases:,}</div></div>', unsafe_allow_html=True)
+    with i4:
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🏨 Most Utilized ER Ward</div><div class="insight-val">{top_er_ward}</div></div>', unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# ==========================================
+# 7. PREDICTIVE LENGTH-OF-STAY DASHBOARD
+# ==========================================
 elif selected_view == "Length-of-Stay Prediction":
-    st.markdown("### ⚙️ Predictive Length-of-Stay Dashboard")
-    st.markdown("Simulate capacity optimization scenarios to project bed-days saved, operational cost reductions, and emergency throughput.")
+    st.markdown("### Predictive Length-of-Stay Dashboard")
+    st.markdown("<div style='font-size:13px; color:#475569; margin-bottom:15px;'>Simulate capacity optimization scenarios to project bed-days saved, operational cost reductions, and emergency throughput.</div>", unsafe_allow_html=True)
     
     st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
@@ -706,17 +996,40 @@ elif selected_view == "Length-of-Stay Prediction":
     with c2:
         st.markdown("#### 📈 Projected Executive ROI & Impact")
         st.markdown(f"""
-            <div style="background: #f8fafc; border-radius: 10px; padding: 20px; border: 1px solid #cbd5e1;">
+            <div style="background: #f8fafc; border-radius: 10px; padding: 16px 20px; border: 1px solid #cbd5e1;">
                 <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">PROJECTED BED-DAYS SAVED</div>
-                <div style="color: #0284c7; font-size: 28px; font-weight: 800;">{bed_days_saved:,.0f} Days</div>
-                <hr style="border-color: #e2e8f0; margin: 10px 0;">
+                <div style="color: #0284c7; font-size: 26px; font-weight: 800;">{bed_days_saved:,.0f} Days</div>
+                <hr style="border-color: #e2e8f0; margin: 8px 0;">
                 <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">ESTIMATED OPERATIONAL FINANCIAL SAVINGS</div>
-                <div style="color: #16a34a; font-size: 28px; font-weight: 800;">₹{cost_saved:,.2f}</div>
-                <hr style="border-color: #e2e8f0; margin: 10px 0;">
+                <div style="color: #16a34a; font-size: 26px; font-weight: 800;">₹{cost_saved:,.2f}</div>
+                <hr style="border-color: #e2e8f0; margin: 8px 0;">
                 <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">ADDITIONAL PATIENT INTAKE CAPACITY</div>
-                <div style="color: #d97706; font-size: 22px; font-weight: 800;">+{extra_capacity:,} Patients</div>
+                <div style="color: #d97706; font-size: 20px; font-weight: 800;">+{extra_capacity:,} Patients</div>
             </div>
         """, unsafe_allow_html=True)
+    st.markdown("</div>", unsafe_allow_html=True)
+
+    # Dynamic Scenario Comparison Bar Chart
+    st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title'><span>📊 Multi-Scenario Length-of-Stay Capacity Impact</span></div>", unsafe_allow_html=True)
+    
+    scenarios = [5, 10, 15, 20, 25, 30]
+    scenario_days = [total_days * (s / 100.0) for s in scenarios]
+    scenario_savings = [d * bed_day_cost / 1e6 for d in scenario_days]
+    
+    scenario_df = pd.DataFrame({
+        'Reduction Scenario': [f"{s}% Target" for s in scenarios],
+        'Bed Days Saved': scenario_days,
+        'Savings (₹ Millions)': scenario_savings
+    })
+    
+    fig_scenario = px.bar(
+        scenario_df, x='Reduction Scenario', y='Bed Days Saved',
+        color='Savings (₹ Millions)', color_continuous_scale='Blues',
+        text_auto='.0f', labels={'Bed Days Saved': 'Bed Days Saved'}
+    )
+    fig_scenario.update_layout(**PLOTLY_LIGHT_THEME, height=320)
+    st.plotly_chart(fig_scenario, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
