@@ -234,52 +234,37 @@ st.markdown("""
     </div>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR NAVIGATION & HOSPITAL FILTERS ---
+# --- SIDEBAR NAVIGATION & SINGLE-SOURCE ROUTING STATE ---
 st.sidebar.markdown("## 🏥 MediPulse")
 st.sidebar.markdown("**Hospital Analytics**")
 st.sidebar.markdown("---")
 
-st.sidebar.markdown("### Operations")
-op_nav = st.sidebar.radio(
-    "Select Operational View",
-    [
-        "Executive Overview",
-        "Bed Capacity & Ward Analytics",
-        "Patient Flow"
-    ],
-    key="op_nav"
+# Defined single unified navigation list to prevent page collision or default falling
+NAV_OPTIONS = [
+    "Executive Overview",
+    "Bed Capacity & Ward Analytics",
+    "Patient Flow",
+    "Revenue & Dues",
+    "Diagnostic Labs & Pharmacy",
+    "Emergency Analytics",
+    "Length-of-Stay Prediction"
+]
+
+if "selected_view" not in st.session_state:
+    st.session_state.selected_view = "Executive Overview"
+
+st.sidebar.markdown("### 📌 Navigation")
+
+def update_nav():
+    st.session_state.selected_view = st.session_state.nav_radio
+
+selected_view = st.sidebar.radio(
+    "Select Dashboard View",
+    options=NAV_OPTIONS,
+    index=NAV_OPTIONS.index(st.session_state.selected_view) if st.session_state.selected_view in NAV_OPTIONS else 0,
+    key="nav_radio",
+    on_change=update_nav
 )
-
-st.sidebar.markdown("### Finance")
-fin_nav = st.sidebar.radio(
-    "Select Financial View",
-    ["Revenue & Dues"],
-    key="fin_nav"
-)
-
-st.sidebar.markdown("### Clinical")
-clin_nav = st.sidebar.radio(
-    "Select Clinical View",
-    ["Diagnostic Labs & Pharmacy", "Emergency Analytics"],
-    key="clin_nav"
-)
-
-st.sidebar.markdown("### Predictive Analytics")
-pred_nav = st.sidebar.radio(
-    "Select Analytics View",
-    ["Length-of-Stay Prediction"],
-    key="pred_nav"
-)
-
-# Active Page Logic
-active_page = op_nav
-# Determine active radio by checking user interaction focus
-ctx = st.session_state
-if "last_clicked" not in ctx:
-    ctx.last_clicked = "Executive Overview"
-
-# Combine radio navigation selections cleanly
-nav_choice = op_nav
 
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 🔎 Hospital Filters")
@@ -321,11 +306,13 @@ PLOTLY_LIGHT_THEME = {
     'yaxis': {'gridcolor': '#f1f5f9', 'zerolinecolor': '#e2e8f0', 'tickfont': {'color': '#475569'}}
 }
 
-# --- EXECUTIVE OVERVIEW PAGE ---
-if op_nav == "Executive Overview":
-    # 5 KPI METRIC CARDS ROW
-    k1, k2, k3, k4, k5 = st.columns(5)
+# --- PAGE ROUTING CONTROLLER ---
+
+# 1. EXECUTIVE OVERVIEW PAGE
+if selected_view == "Executive Overview":
+    st.markdown("### 📊 Executive Overview Dashboard")
     
+    k1, k2, k3, k4, k5 = st.columns(5)
     with k1:
         st.markdown(f"""
             <div class="hospital-kpi-card">
@@ -334,7 +321,6 @@ if op_nav == "Executive Overview":
                 <div class="kpi-card-sub">👥 {f_df['Patient_ID'].nunique():,} Unique Patients</div>
             </div>
         """, unsafe_allow_html=True)
-        
     with k2:
         st.markdown(f"""
             <div class="hospital-kpi-card hospital-kpi-card-teal">
@@ -343,7 +329,6 @@ if op_nav == "Executive Overview":
                 <div class="kpi-card-sub">💳 Avg ₹{f_df['Total_Amount'].mean():,.0f} / Patient</div>
             </div>
         """, unsafe_allow_html=True)
-        
     with k3:
         st.markdown(f"""
             <div class="hospital-kpi-card">
@@ -352,7 +337,6 @@ if op_nav == "Executive Overview":
                 <div class="kpi-card-sub">⏱️ Bed Turnaround Ratio</div>
             </div>
         """, unsafe_allow_html=True)
-        
     with k4:
         st.markdown(f"""
             <div class="hospital-kpi-card hospital-kpi-card-rose">
@@ -361,7 +345,6 @@ if op_nav == "Executive Overview":
                 <div class="kpi-card-sub">🚑 {f_df['Emergency'].value_counts().get('Yes', 0):,} ER Cases</div>
             </div>
         """, unsafe_allow_html=True)
-        
     with k5:
         st.markdown(f"""
             <div class="hospital-kpi-card hospital-kpi-card-amber">
@@ -401,9 +384,9 @@ if op_nav == "Executive Overview":
         st.plotly_chart(fig_monthly, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- BED CAPACITY & WARD ANALYTICS PAGE ---
-elif op_nav == "Bed Capacity & Ward Analytics":
-    st.markdown("### 🛏️ Hospital Ward Capacity & Accommodation Matrix")
+# 2. BED CAPACITY & WARD ANALYTICS PAGE
+elif selected_view == "Bed Capacity & Ward Analytics":
+    st.markdown("### 🛏️ Bed Capacity & Ward Analytics Dashboard")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -440,9 +423,45 @@ elif op_nav == "Bed Capacity & Ward Analytics":
     st.plotly_chart(fig_heat, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# --- REVENUE & DUES PAGE ---
-elif fin_nav == "Revenue & Dues":
-    st.markdown("### 💰 Financial Revenue Cycle & Dues Recovery")
+# 3. PATIENT FLOW PAGE
+elif selected_view == "Patient Flow":
+    st.markdown("### 🔄 Patient Flow Dashboard")
+    
+    p1, p2, p3, p4 = st.columns(4)
+    with p1:
+        st.metric("Total Admissions", f"{len(f_df):,}")
+    with p2:
+        st.metric("Avg Length of Stay", f"{f_df['Length_of_Stay_Days'].mean():.1f} Days")
+    with p3:
+        st.metric("Daily Avg Intake", f"{round(len(f_df)/max(1, f_df['Admission_Date'].dt.to_period('M').nunique()*30), 1)} / Day")
+    with p4:
+        st.metric("Discharge Completion", f"{f_df['Discharge_Date'].notnull().sum():,}")
+        
+    st.markdown("<br>", unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>📈 Patient Volume Flow Over Time</span></div>", unsafe_allow_html=True)
+        f_df['Month_Year'] = f_df['Admission_Date'].dt.to_period('M').astype(str)
+        monthly_df = f_df.groupby('Month_Year')['Admission_ID'].count().reset_index()
+        fig_flow = px.line(monthly_df, x='Month_Year', y='Admission_ID', markers=True, color_discrete_sequence=['#0284c7'])
+        fig_flow.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        st.plotly_chart(fig_flow, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with c2:
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🏥 Department Intake Distribution</span></div>", unsafe_allow_html=True)
+        dept_counts = f_df['Department'].value_counts().head(10).reset_index()
+        dept_counts.columns = ['Department', 'Count']
+        fig_dept_flow = px.bar(dept_counts, x='Count', y='Department', orientation='h', color='Count', color_continuous_scale='Teal')
+        fig_dept_flow.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        st.plotly_chart(fig_dept_flow, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# 4. REVENUE & DUES PAGE
+elif selected_view == "Revenue & Dues":
+    st.markdown("### 💰 Financial Revenue Cycle & Dues Recovery Dashboard")
     
     f1, f2, f3 = st.columns(3)
     with f1:
@@ -479,9 +498,9 @@ elif fin_nav == "Revenue & Dues":
         st.plotly_chart(fig_rev, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- DIAGNOSTICS & PHARMACY PAGE ---
-elif clin_nav == "Diagnostic Labs & Pharmacy" or clin_nav == "Emergency Analytics":
-    st.markdown("### 🧪 Diagnostic Lab Utilization & Pharmacy Demand")
+# 5. DIAGNOSTIC LABS & PHARMACY PAGE
+elif selected_view == "Diagnostic Labs & Pharmacy":
+    st.markdown("### 🧪 Diagnostic Labs & Pharmacy Dashboard")
     
     d1, d2 = st.columns(2)
     with d1:
@@ -510,9 +529,47 @@ elif clin_nav == "Diagnostic Labs & Pharmacy" or clin_nav == "Emergency Analytic
         st.plotly_chart(fig_med, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- PREDICTIVE DECISION MODEL PAGE ---
-elif pred_nav == "Length-of-Stay Prediction":
-    st.markdown("### ⚙️ Length-of-Stay Decision Analytics & Simulation")
+# 6. EMERGENCY ANALYTICS PAGE
+elif selected_view == "Emergency Analytics":
+    st.markdown("### 🚨 Emergency Analytics Dashboard")
+    
+    er_df = f_df[f_df['Emergency'] == 'Yes']
+    
+    e1, e2, e3, e4 = st.columns(4)
+    with e1:
+        st.metric("Total Emergency Cases", f"{len(er_df):,}")
+    with e2:
+        st.metric("Emergency Ratio", f"{(len(er_df)/max(1, len(f_df))*100):.1f}%")
+    with e3:
+        st.metric("Avg Emergency Stay", f"{er_df['Length_of_Stay_Days'].mean():.1f} Days")
+    with e4:
+        st.metric("Emergency ICU Cases", f"{len(er_df[er_df['Ward']=='Icu']):,}")
+        
+    st.markdown("<br>", unsafe_allow_html=True)
+    c1, c2 = st.columns(2)
+    with c1:
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🚨 Emergency Cases by Department</span></div>", unsafe_allow_html=True)
+        er_dept = er_df['Department'].value_counts().head(10).reset_index()
+        er_dept.columns = ['Department', 'Count']
+        fig_er_dept = px.bar(er_dept, x='Count', y='Department', orientation='h', color='Count', color_continuous_scale='Reds')
+        fig_er_dept.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        st.plotly_chart(fig_er_dept, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+    with c2:
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🏥 Emergency Ward Allocation</span></div>", unsafe_allow_html=True)
+        er_ward = er_df['Ward'].value_counts().reset_index()
+        er_ward.columns = ['Ward', 'Count']
+        fig_er_ward = px.pie(er_ward, values='Count', names='Ward', hole=0.4, color_discrete_sequence=['#be123c', '#e11d48', '#fb7185'])
+        fig_er_ward.update_layout(**PLOTLY_LIGHT_THEME, height=350)
+        st.plotly_chart(fig_er_ward, use_container_width=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+
+# 7. LENGTH-OF-STAY PREDICTION PAGE
+elif selected_view == "Length-of-Stay Prediction":
+    st.markdown("### ⚙️ Predictive Length-of-Stay Dashboard")
     st.markdown("Simulate capacity optimization scenarios to project bed-days saved, operational cost reductions, and emergency throughput.")
     
     st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
