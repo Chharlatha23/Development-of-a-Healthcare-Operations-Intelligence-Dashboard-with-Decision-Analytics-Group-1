@@ -7,151 +7,194 @@ import os
 
 # Set Clinical Hospital Theme & Layout
 st.set_page_config(
-    page_title="MediPulse Enterprise | Hospital Operations Intelligence & Decision Command",
+    page_title="MediPulse Hospital Analytics | Clinical Operations",
     page_icon="🏥",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# Advanced Modern Glassmorphism & High-Contrast Dark Clinical Theme
+# Professional Clean Hospital Theme CSS (WCAG Accessible, High Contrast Light Theme)
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
     
+    /* Base Font & Page Reset */
     html, body, [class*="css"] {
-        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
     
     .stApp {
-        background: radial-gradient(circle at top right, #0d1527 0%, #050811 100%);
-        color: #f1f5f9;
+        background-color: #f8fafc;
+        color: #0f172a;
     }
 
-    /* Glassmorphic Command Header */
-    .command-header {
-        background: rgba(15, 23, 42, 0.75);
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        padding: 22px 28px;
-        border-radius: 20px;
-        margin-bottom: 25px;
+    /* Reduce Wasted White Space at Top */
+    .block-container {
+        padding-top: 1.5rem !important;
+        padding-bottom: 2rem !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+        max-width: 100% !important;
+    }
+
+    /* Clean Enterprise Hospital Header */
+    .hospital-header-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 18px 24px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+        margin-bottom: 20px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
     }
 
-    .command-title {
-        font-size: 26px;
-        font-weight: 800;
-        background: linear-gradient(90deg, #38bdf8 0%, #818cf8 50%, #34d399 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        letter-spacing: -0.02em;
+    .hospital-header-title {
+        color: #0f172a;
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 10px;
     }
 
-    .badge-pulse {
+    .hospital-header-subtitle {
+        color: #475569;
+        font-size: 13px;
+        font-weight: 500;
+        margin-top: 4px;
+    }
+
+    .status-badge-live {
+        background-color: #f0fdf4;
+        color: #166534;
+        border: 1px solid #bbf7d0;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        background: rgba(20, 184, 166, 0.15);
-        border: 1px solid rgba(45, 212, 191, 0.4);
-        color: #2dd4bf;
-        padding: 4px 14px;
-        border-radius: 30px;
-        font-size: 12px;
-        font-weight: 700;
-        letter-spacing: 0.05em;
     }
 
-    .pulse-dot {
+    .status-dot-green {
         width: 8px;
         height: 8px;
-        background-color: #10b981;
+        background-color: #16a34a;
         border-radius: 50%;
-        box-shadow: 0 0 10px #10b981;
     }
 
-    /* Executive Glass KPI Cards */
-    .glass-kpi {
-        background: linear-gradient(135deg, rgba(30, 41, 59, 0.6) 0%, rgba(15, 23, 42, 0.8) 100%);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 18px;
-        padding: 20px;
-        position: relative;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    /* Clean White KPI Metric Cards */
+    .hospital-kpi-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 16px 20px;
+        border: 1px solid #e2e8f0;
+        border-left: 4px solid #0284c7; /* Primary Medical Blue */
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+        height: 100%;
     }
 
-    .glass-kpi:hover {
-        transform: translateY(-4px);
-        border-color: rgba(56, 189, 248, 0.4);
-        box-shadow: 0 20px 30px -10px rgba(14, 165, 233, 0.15);
+    .hospital-kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.05);
     }
 
-    .kpi-tag {
+    .hospital-kpi-card-rose {
+        border-left-color: #e11d48 !important; /* Critical Emergency Red */
+    }
+
+    .hospital-kpi-card-teal {
+        border-left-color: #0d9488 !important; /* Medical Teal */
+    }
+
+    .hospital-kpi-card-amber {
+        border-left-color: #d97706 !important; /* Warning Amber */
+    }
+
+    .kpi-card-label {
         font-size: 11px;
         font-weight: 700;
+        color: #475569;
         text-transform: uppercase;
-        letter-spacing: 0.1em;
-        color: #94a3b8;
-        margin-bottom: 6px;
+        letter-spacing: 0.05em;
+        margin-bottom: 4px;
     }
 
-    .kpi-num {
-        font-size: 30px;
+    .kpi-card-value {
+        font-size: 26px;
         font-weight: 800;
-        font-family: 'JetBrains Mono', monospace;
-        letter-spacing: -0.03em;
+        color: #0f172a;
+        line-height: 1.2;
     }
 
-    .kpi-trend {
+    .kpi-card-value-rose {
+        color: #be123c;
+    }
+
+    .kpi-card-sub {
         font-size: 12px;
-        font-weight: 600;
-        margin-top: 6px;
-        display: flex;
-        align-items: center;
-        gap: 4px;
+        font-weight: 500;
+        color: #64748b;
+        margin-top: 4px;
     }
 
-    /* Custom Color Accents */
-    .cyan-glow { color: #38bdf8; text-shadow: 0 0 15px rgba(56, 189, 248, 0.3); }
-    .teal-glow { color: #2dd4bf; text-shadow: 0 0 15px rgba(45, 212, 191, 0.3); }
-    .emerald-glow { color: #34d399; text-shadow: 0 0 15px rgba(52, 211, 153, 0.3); }
-    .amber-glow { color: #fbbf24; text-shadow: 0 0 15px rgba(251, 191, 36, 0.3); }
-    .rose-glow { color: #f43f5e; text-shadow: 0 0 15px rgba(244, 63, 94, 0.3); }
-
-    /* Glass Container Containers */
-    .glass-card {
-        background: rgba(15, 23, 42, 0.65);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.07);
-        border-radius: 18px;
-        padding: 24px;
-        margin-bottom: 22px;
-        box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.4);
+    /* White Section Card Containers for Charts */
+    .chart-container-card {
+        background-color: #ffffff;
+        border-radius: 12px;
+        padding: 20px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+        margin-bottom: 20px;
     }
 
-    .card-heading {
-        font-size: 17px;
+    .chart-card-title {
+        font-size: 16px;
         font-weight: 700;
-        color: #f8fafc;
-        margin-bottom: 18px;
+        color: #0f172a;
+        margin-bottom: 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
     }
 
-    /* Sidebar Styling */
+    /* Clean Sidebar Styling */
     section[data-testid="stSidebar"] {
-        background-color: #090e17;
-        border-right: 1px solid rgba(255, 255, 255, 0.06);
+        background-color: #ffffff !important;
+        border-right: 1px solid #e2e8f0 !important;
+    }
+
+    section[data-testid="stSidebar"] .stRadio label {
+        color: #0f172a !important;
+        font-weight: 500 !important;
+        font-size: 14px !important;
+    }
+
+    /* High Contrast Text overrides for Filter elements */
+    .stSelectbox label, .stMultiSelect label, .stSlider label {
+        color: #0f172a !important;
+        font-weight: 600 !important;
+        font-size: 13px !important;
     }
     
-    .stSelectbox, .stMultiSelect {
-        background-color: rgba(30, 41, 59, 0.5);
+    /* Ensure Streamlit Widgets blend into light medical theme */
+    div[data-baseweb="select"] > div {
+        background-color: #ffffff !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    
+    div[data-baseweb="select"] span {
+        color: #0f172a !important;
+    }
+
+    hr {
+        border-color: #e2e8f0 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -169,36 +212,77 @@ def load_data():
 df = load_data()
 
 if df is None:
-    st.error("⚠️ Inpatient Dataset missing! Run scripts/data_cleaning.py first.")
+    st.error("⚠️ Hospital Clinical Dataset Not Found! Please verify data pipeline.")
     st.stop()
 
-# --- TOP GLASS CLINICAL HEADER ---
+# --- PROFESSIONAL CLEAN HOSPITAL HEADER ---
 st.markdown("""
-    <div class="command-header">
+    <div class="hospital-header-card">
         <div>
-            <div class="command-title">🏥 MediPulse Command Center</div>
-            <div style="color: #94a3b8; font-size: 13px; font-weight: 500; margin-top: 4px;">
-                Enterprise Healthcare Operations Intelligence & Real-Time Decision Analytics | Group 1
+            <div class="hospital-header-title">
+                🏥 MediPulse Hospital Analytics
+            </div>
+            <div class="hospital-header-subtitle">
+                Hospital Operations | Patient Flow | Emergency Care | Financial Analytics
             </div>
         </div>
-        <div class="badge-pulse">
-            <div class="pulse-dot"></div> OPERATIONAL MODE: ACTIVE MONITORING
+        <div>
+            <span class="status-badge-live">
+                <span class="status-dot-green"></span> Hospital Operations: Live
+            </span>
         </div>
     </div>
 """, unsafe_allow_html=True)
 
-# --- SIDEBAR NAVIGATION & FILTERS ---
-st.sidebar.markdown("### 🎛️ Navigation & Controls")
-nav_option = st.sidebar.radio("View Workspace", [
-    "📊 Executive Command & Operations",
-    "🛏️ Bed Capacity & Ward Heatmap",
-    "💳 Financial Revenue & Dues Engine",
-    "🧪 Diagnostic Labs & Pharmacy Analytics",
-    "⚡ Predictive Length-of-Stay Decision Model"
-])
+# --- SIDEBAR NAVIGATION & HOSPITAL FILTERS ---
+st.sidebar.markdown("## 🏥 MediPulse")
+st.sidebar.markdown("**Hospital Analytics**")
+st.sidebar.markdown("---")
+
+st.sidebar.markdown("### Operations")
+op_nav = st.sidebar.radio(
+    "Select Operational View",
+    [
+        "Executive Overview",
+        "Bed Capacity & Ward Analytics",
+        "Patient Flow"
+    ],
+    key="op_nav"
+)
+
+st.sidebar.markdown("### Finance")
+fin_nav = st.sidebar.radio(
+    "Select Financial View",
+    ["Revenue & Dues"],
+    key="fin_nav"
+)
+
+st.sidebar.markdown("### Clinical")
+clin_nav = st.sidebar.radio(
+    "Select Clinical View",
+    ["Diagnostic Labs & Pharmacy", "Emergency Analytics"],
+    key="clin_nav"
+)
+
+st.sidebar.markdown("### Predictive Analytics")
+pred_nav = st.sidebar.radio(
+    "Select Analytics View",
+    ["Length-of-Stay Prediction"],
+    key="pred_nav"
+)
+
+# Active Page Logic
+active_page = op_nav
+# Determine active radio by checking user interaction focus
+ctx = st.session_state
+if "last_clicked" not in ctx:
+    ctx.last_clicked = "Executive Overview"
+
+# Combine radio navigation selections cleanly
+nav_choice = op_nav
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("### 🔍 Global Filters")
+st.sidebar.markdown("### 🔎 Hospital Filters")
 
 dept_filter = st.sidebar.multiselect(
     "Clinical Department",
@@ -217,7 +301,7 @@ emergency_filter = st.sidebar.selectbox(
     options=["All Statuses", "Emergency", "Elective/Regular"]
 )
 
-# Apply global filters
+# Apply global dataset filters without altering calculations
 f_df = df.copy()
 if dept_filter:
     f_df = f_df[f_df['Department'].isin(dept_filter)]
@@ -228,201 +312,215 @@ if emergency_filter == "Emergency":
 elif emergency_filter == "Elective/Regular":
     f_df = f_df[f_df['Emergency'] == "No"]
 
-# Shared Plotly Dark Theme Config
-PLOTLY_THEME = {
+# Shared Plotly Light Theme Config for Clear Visual Readability
+PLOTLY_LIGHT_THEME = {
     'paper_bgcolor': 'rgba(0,0,0,0)',
     'plot_bgcolor': 'rgba(0,0,0,0)',
-    'font': {'family': 'Plus Jakarta Sans', 'color': '#94a3b8'},
-    'xaxis': {'gridcolor': 'rgba(255,255,255,0.05)', 'zerolinecolor': 'rgba(255,255,255,0.05)'},
-    'yaxis': {'gridcolor': 'rgba(255,255,255,0.05)', 'zerolinecolor': 'rgba(255,255,255,0.05)'}
+    'font': {'family': 'Inter, sans-serif', 'color': '#334155'},
+    'xaxis': {'gridcolor': '#f1f5f9', 'zerolinecolor': '#e2e8f0', 'tickfont': {'color': '#475569'}},
+    'yaxis': {'gridcolor': '#f1f5f9', 'zerolinecolor': '#e2e8f0', 'tickfont': {'color': '#475569'}}
 }
 
-# --- PAGE 1: EXECUTIVE COMMAND & OPERATIONS ---
-if nav_option == "📊 Executive Command & Operations":
-    st.markdown("### ⚡ Live Operational Performance Matrix")
+# --- EXECUTIVE OVERVIEW PAGE ---
+if op_nav == "Executive Overview":
+    # 5 KPI METRIC CARDS ROW
+    k1, k2, k3, k4, k5 = st.columns(5)
     
-    c1, c2, c3, c4, c5 = st.columns(5)
-    with c1:
+    with k1:
         st.markdown(f"""
-            <div class="glass-kpi">
-                <div class="kpi-tag">Total Inpatient Volume</div>
-                <div class="kpi-num cyan-glow">{len(f_df):,}</div>
-                <div class="kpi-trend" style="color:#38bdf8;">👥 {f_df['Patient_ID'].nunique():,} Unique Patients</div>
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Total Inpatients</div>
+                <div class="kpi-card-value">{len(f_df):,}</div>
+                <div class="kpi-card-sub">👥 {f_df['Patient_ID'].nunique():,} Unique Patients</div>
             </div>
         """, unsafe_allow_html=True)
-    with c2:
+        
+    with k2:
         st.markdown(f"""
-            <div class="glass-kpi">
-                <div class="kpi-tag">Gross Revenue Billed</div>
-                <div class="kpi-num teal-glow">₹{f_df['Total_Amount'].sum()/1e6:.1f}M</div>
-                <div class="kpi-trend" style="color:#2dd4bf;">💳 Avg ₹{f_df['Total_Amount'].mean():,.0f}/Patient</div>
+            <div class="hospital-kpi-card hospital-kpi-card-teal">
+                <div class="kpi-card-label">Gross Revenue</div>
+                <div class="kpi-card-value">₹{f_df['Total_Amount'].sum()/1e6:.1f}M</div>
+                <div class="kpi-card-sub">💳 Avg ₹{f_df['Total_Amount'].mean():,.0f} / Patient</div>
             </div>
         """, unsafe_allow_html=True)
-    with c3:
+        
+    with k3:
         st.markdown(f"""
-            <div class="glass-kpi">
-                <div class="kpi-tag">Avg Length of Stay</div>
-                <div class="kpi-num emerald-glow">{f_df['Length_of_Stay_Days'].mean():.1f} <span style="font-size:16px;">Days</span></div>
-                <div class="kpi-trend" style="color:#34d399;">⏱️ Bed Turnaround Ratio</div>
+            <div class="hospital-kpi-card">
+                <div class="kpi-card-label">Average Length of Stay</div>
+                <div class="kpi-card-value">{f_df['Length_of_Stay_Days'].mean():.1f} <span style="font-size:14px; font-weight:600;">Days</span></div>
+                <div class="kpi-card-sub">⏱️ Bed Turnaround Ratio</div>
             </div>
         """, unsafe_allow_html=True)
-    with c4:
+        
+    with k4:
         st.markdown(f"""
-            <div class="glass-kpi">
-                <div class="kpi-tag">Emergency Critical Rate</div>
-                <div class="kpi-num rose-glow">{(f_df['Emergency'].value_counts().get('Yes', 0)/len(f_df)*100 if len(f_df)>0 else 0):.1f}%</div>
-                <div class="kpi-trend" style="color:#f43f5e;">🚨 {f_df['Emergency'].value_counts().get('Yes', 0):,} ER Cases</div>
+            <div class="hospital-kpi-card hospital-kpi-card-rose">
+                <div class="kpi-card-label">Emergency Critical Rate</div>
+                <div class="kpi-card-value kpi-card-value-rose">{(f_df['Emergency'].value_counts().get('Yes', 0)/len(f_df)*100 if len(f_df)>0 else 0):.1f}%</div>
+                <div class="kpi-card-sub">🚑 {f_df['Emergency'].value_counts().get('Yes', 0):,} ER Cases</div>
             </div>
         """, unsafe_allow_html=True)
-    with c5:
+        
+    with k5:
         st.markdown(f"""
-            <div class="glass-kpi">
-                <div class="kpi-tag">Net Pending Recovery</div>
-                <div class="kpi-num amber-glow">₹{f_df['Outstanding_Balance'].sum()/1e6:.1f}M</div>
-                <div class="kpi-trend" style="color:#fbbf24;">⚠️ Uncollected Balances</div>
+            <div class="hospital-kpi-card hospital-kpi-card-amber">
+                <div class="kpi-card-label">Pending Recovery</div>
+                <div class="kpi-card-value">₹{f_df['Outstanding_Balance'].sum()/1e6:.1f}M</div>
+                <div class="kpi-card-sub">⚠️ Uncollected Balances</div>
             </div>
         """, unsafe_allow_html=True)
 
     st.markdown("<br>", unsafe_allow_html=True)
     
-    col_a, col_b = st.columns([1.2, 1])
-    with col_a:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='card-heading'><span>🏥 Department Admission Intake Load</span><span style='font-size:12px; color:#64748b;'>20 Clinical Specialties</span></div>", unsafe_allow_html=True)
+    col_left, col_right = st.columns([1.2, 1])
+    with col_left:
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🏥 Department Admission Intake</span><span style='font-size:12px; color:#64748b;'>Top Specialties</span></div>", unsafe_allow_html=True)
         dept_counts = f_df['Department'].value_counts().reset_index()
         dept_counts.columns = ['Department', 'Admissions']
-        fig_dept = px.bar(dept_counts.head(10), x='Admissions', y='Department', orientation='h',
-                          color='Admissions', color_continuous_scale='Teal', template='plotly_dark',
-                          text='Admissions')
-        fig_dept.update_traces(textposition='outside')
-        fig_dept.update_layout(**PLOTLY_THEME, height=360, margin=dict(l=0,r=20,t=10,b=0))
+        fig_dept = px.bar(
+            dept_counts.head(10), x='Admissions', y='Department', orientation='h',
+            color='Admissions', color_continuous_scale='Blues', text='Admissions'
+        )
+        fig_dept.update_traces(textposition='outside', marker_line_color='#0284c7', marker_line_width=1)
+        fig_dept.update_layout(**PLOTLY_LIGHT_THEME, height=360, margin=dict(l=0, r=20, t=10, b=0))
         st.plotly_chart(fig_dept, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with col_b:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='card-heading'><span>📈 Inpatient Monthly Flow Trajectory</span><span style='font-size:12px; color:#64748b;'>Historical Volume</span></div>", unsafe_allow_html=True)
+    with col_right:
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>📈 Inpatient Monthly Flow</span><span style='font-size:12px; color:#64748b;'>Volume Trends</span></div>", unsafe_allow_html=True)
         f_df['Month_Year'] = f_df['Admission_Date'].dt.to_period('M').astype(str)
         monthly_df = f_df.groupby('Month_Year')['Admission_ID'].count().reset_index()
-        fig_monthly = px.area(monthly_df, x='Month_Year', y='Admission_ID',
-                              labels={'Admission_ID': 'Admissions'}, template='plotly_dark',
-                              color_discrete_sequence=['#38bdf8'])
-        fig_monthly.update_layout(**PLOTLY_THEME, height=360, margin=dict(l=0,r=10,t=10,b=0))
+        fig_monthly = px.area(
+            monthly_df, x='Month_Year', y='Admission_ID',
+            labels={'Admission_ID': 'Admissions'}, color_discrete_sequence=['#0284c7']
+        )
+        fig_monthly.update_layout(**PLOTLY_LIGHT_THEME, height=360, margin=dict(l=0, r=10, t=10, b=0))
         st.plotly_chart(fig_monthly, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- PAGE 2: BED CAPACITY & WARD HEATMAP ---
-elif nav_option == "🛏️ Bed Capacity & Ward Heatmap":
-    st.markdown("### 🛏️ Hospital Ward Occupancy & Bed Utilization Matrix")
+# --- BED CAPACITY & WARD ANALYTICS PAGE ---
+elif op_nav == "Bed Capacity & Ward Analytics":
+    st.markdown("### 🛏️ Hospital Ward Capacity & Accommodation Matrix")
     
     col1, col2 = st.columns(2)
     with col1:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='card-heading'><span>🏨 Ward Occupancy Breakdown</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🏨 Ward Occupancy Breakdown</span></div>", unsafe_allow_html=True)
         ward_df = f_df['Ward'].value_counts().reset_index()
         ward_df.columns = ['Ward', 'Count']
-        fig_ward = px.pie(ward_df, values='Count', names='Ward', hole=0.55,
-                          color_discrete_sequence=['#0f766e', '#0284c7', '#d97706', '#818cf8'],
-                          template='plotly_dark')
-        fig_ward.update_layout(**PLOTLY_THEME, height=340)
+        fig_ward = px.pie(
+            ward_df, values='Count', names='Ward', hole=0.5,
+            color_discrete_sequence=['#0284c7', '#0d9488', '#d97706', '#6366f1']
+        )
+        fig_ward.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_ward, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
         
     with col2:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='card-heading'><span>🚪 Room Accommodation Split</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🚪 Room Type Accommodation Split</span></div>", unsafe_allow_html=True)
         room_df = f_df['Room_Type'].value_counts().reset_index()
         room_df.columns = ['Room_Type', 'Count']
-        fig_room = px.bar(room_df, x='Room_Type', y='Count', color='Room_Type',
-                          color_discrete_sequence=['#2dd4bf', '#38bdf8', '#fbbf24'],
-                          template='plotly_dark')
-        fig_room.update_layout(**PLOTLY_THEME, height=340)
+        fig_room = px.bar(
+            room_df, x='Room_Type', y='Count', color='Room_Type',
+            color_discrete_sequence=['#0ea5e9', '#14b8a6', '#f59e0b']
+        )
+        fig_room.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_room, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='card-heading'><span>🔥 Department vs. Ward Occupancy Matrix (Heatmap)</span></div>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title'><span>🔥 Department vs. Ward Occupancy Matrix (Heatmap)</span></div>", unsafe_allow_html=True)
     heatmap_data = pd.crosstab(f_df['Department'], f_df['Ward'])
-    fig_heat = px.imshow(heatmap_data, text_auto=True, aspect="auto", color_continuous_scale="Viridis", template='plotly_dark')
-    fig_heat.update_layout(**PLOTLY_THEME, height=420)
+    fig_heat = px.imshow(heatmap_data, text_auto=True, aspect="auto", color_continuous_scale="Blues")
+    fig_heat.update_layout(**PLOTLY_LIGHT_THEME, height=400)
     st.plotly_chart(fig_heat, use_container_width=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
-# --- PAGE 3: FINANCIAL REVENUE & DUES ENGINE ---
-elif nav_option == "💳 Financial Revenue & Dues Engine":
-    st.markdown("### 💳 Revenue Cycle & Insurance Claim Recovery Analytics")
+# --- REVENUE & DUES PAGE ---
+elif fin_nav == "Revenue & Dues":
+    st.markdown("### 💰 Financial Revenue Cycle & Dues Recovery")
     
     f1, f2, f3 = st.columns(3)
     with f1:
-        st.metric("Total Billed Revenue", f"₹{f_df['Total_Amount'].sum():,.2f}")
+        st.metric("Gross Billed Revenue", f"₹{f_df['Total_Amount'].sum():,.2f}")
     with f2:
-        st.metric("Insurance Claim Cover", f"₹{f_df['Insurance_Cover'].sum():,.2f}")
+        st.metric("Insurance Covered Claims", f"₹{f_df['Insurance_Cover'].sum():,.2f}")
     with f3:
-        st.metric("Net Pending Patient Dues", f"₹{f_df['Outstanding_Balance'].sum():,.2f}")
+        st.metric("Net Pending Dues", f"₹{f_df['Outstanding_Balance'].sum():,.2f}")
 
     st.markdown("<br>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='card-heading'><span>📊 Payment Settlement Status</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>💳 Payment Settlement Lifecycle</span></div>", unsafe_allow_html=True)
         pay_df = f_df['Payment_Status'].value_counts().reset_index()
         pay_df.columns = ['Status', 'Count']
-        fig_pay = px.pie(pay_df, values='Count', names='Status', color='Status',
-                         color_discrete_map={'Paid': '#10b981', 'Partial': '#f59e0b', 'Pending': '#ef4444'},
-                         template='plotly_dark')
-        fig_pay.update_layout(**PLOTLY_THEME, height=350)
+        fig_pay = px.pie(
+            pay_df, values='Count', names='Status', color='Status',
+            color_discrete_map={'Paid': '#16a34a', 'Partial': '#d97706', 'Pending': '#dc2626'}
+        )
+        fig_pay.update_layout(**PLOTLY_LIGHT_THEME, height=350)
         st.plotly_chart(fig_pay, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with c2:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='card-heading'><span>💰 Revenue Contribution by Department</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🏛️ Revenue Contribution by Department</span></div>", unsafe_allow_html=True)
         rev_dept = f_df.groupby('Department')['Total_Amount'].sum().reset_index().sort_values('Total_Amount', ascending=False)
-        fig_rev = px.bar(rev_dept.head(10), x='Total_Amount', y='Department', orientation='h',
-                         color='Total_Amount', color_continuous_scale='Purples', template='plotly_dark')
-        fig_rev.update_layout(**PLOTLY_THEME, height=350)
+        fig_rev = px.bar(
+            rev_dept.head(10), x='Total_Amount', y='Department', orientation='h',
+            color='Total_Amount', color_continuous_scale='Blues'
+        )
+        fig_rev.update_layout(**PLOTLY_LIGHT_THEME, height=350)
         st.plotly_chart(fig_rev, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- PAGE 4: DIAGNOSTIC LABS & PHARMACY ---
-elif nav_option == "🧪 Diagnostic Labs & Pharmacy Analytics":
-    st.markdown("### 🧪 Pathology Diagnostic Demand & Pharmacy Distribution")
+# --- DIAGNOSTICS & PHARMACY PAGE ---
+elif clin_nav == "Diagnostic Labs & Pharmacy" or clin_nav == "Emergency Analytics":
+    st.markdown("### 🧪 Diagnostic Lab Utilization & Pharmacy Demand")
     
     d1, d2 = st.columns(2)
     with d1:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='card-heading'><span>📋 Top 10 Clinical Diagnoses Load</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>📋 Top 10 Clinical Diagnoses</span></div>", unsafe_allow_html=True)
         diag_df = f_df['Diagnosis'].value_counts().head(10).reset_index()
         diag_df.columns = ['Diagnosis', 'Count']
-        fig_diag = px.bar(diag_df, x='Count', y='Diagnosis', orientation='h', color='Count',
-                          color_continuous_scale='Blues', template='plotly_dark')
-        fig_diag.update_layout(**PLOTLY_THEME, height=360)
+        fig_diag = px.bar(
+            diag_df, x='Count', y='Diagnosis', orientation='h', color='Count',
+            color_continuous_scale='Blues'
+        )
+        fig_diag.update_layout(**PLOTLY_LIGHT_THEME, height=360)
         st.plotly_chart(fig_diag, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
     with d2:
-        st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='card-heading'><span>💊 Top Prescribed Medications</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>💊 Top Prescribed Medications</span></div>", unsafe_allow_html=True)
         med_df = f_df['Medicine'].value_counts().head(10).reset_index()
         med_df.columns = ['Medicine', 'Count']
-        fig_med = px.bar(med_df, x='Count', y='Medicine', orientation='h', color='Count',
-                         color_continuous_scale='Greens', template='plotly_dark')
-        fig_med.update_layout(**PLOTLY_THEME, height=360)
+        fig_med = px.bar(
+            med_df, x='Count', y='Medicine', orientation='h', color='Count',
+            color_continuous_scale='Teal'
+        )
+        fig_med.update_layout(**PLOTLY_LIGHT_THEME, height=360)
         st.plotly_chart(fig_med, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-# --- PAGE 5: PREDICTIVE LOS DECISION MODEL ---
-elif nav_option == "⚡ Predictive Length-of-Stay Decision Model":
-    st.markdown("### ⚙️ Executive Decision Analytics & Length-of-Stay Simulator")
+# --- PREDICTIVE DECISION MODEL PAGE ---
+elif pred_nav == "Length-of-Stay Prediction":
+    st.markdown("### ⚙️ Length-of-Stay Decision Analytics & Simulation")
     st.markdown("Simulate capacity optimization scenarios to project bed-days saved, operational cost reductions, and emergency throughput.")
     
-    st.markdown("<div class='glass-card'>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("#### 🎛️ Simulation Parameters")
         target_los_reduction = st.slider("Target Inpatient Length-of-Stay Reduction (%)", 0, 40, 15)
         bed_day_cost = st.number_input("Average Operational Cost per Bed-Day (₹)", 1000, 25000, 5000)
-        est_daily_er_turnaround = st.slider("Target ER Discharge Efficiency Gain (%)", 0, 30, 10)
         
     total_days = f_df['Length_of_Stay_Days'].sum()
     bed_days_saved = total_days * (target_los_reduction / 100.0)
@@ -432,18 +530,18 @@ elif nav_option == "⚡ Predictive Length-of-Stay Decision Model":
     with c2:
         st.markdown("#### 📈 Projected Executive ROI & Impact")
         st.markdown(f"""
-            <div style="background: rgba(15, 23, 42, 0.9); border-radius: 14px; padding: 22px; border: 1px solid rgba(56, 189, 248, 0.3);">
-                <div style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">PROJECTED BED-DAYS SAVED</div>
-                <div style="color: #38bdf8; font-size: 32px; font-weight: 800; font-family:'JetBrains Mono';">{bed_days_saved:,.0f} Days</div>
-                <hr style="border-color: rgba(255,255,255,0.08); margin: 12px 0;">
-                <div style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">ESTIMATED OPERATIONAL FINANCIAL SAVINGS</div>
-                <div style="color: #34d399; font-size: 32px; font-weight: 800; font-family:'JetBrains Mono';">₹{cost_saved:,.2f}</div>
-                <hr style="border-color: rgba(255,255,255,0.08); margin: 12px 0;">
-                <div style="color: #94a3b8; font-size: 12px; font-weight: 700; text-transform: uppercase;">ADDITIONAL PATIENT INTAKE CAPACITY</div>
-                <div style="color: #fbbf24; font-size: 24px; font-weight: 800; font-family:'JetBrains Mono';">+{extra_capacity:,} Patients</div>
+            <div style="background: #f8fafc; border-radius: 10px; padding: 20px; border: 1px solid #cbd5e1;">
+                <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">PROJECTED BED-DAYS SAVED</div>
+                <div style="color: #0284c7; font-size: 28px; font-weight: 800;">{bed_days_saved:,.0f} Days</div>
+                <hr style="border-color: #e2e8f0; margin: 10px 0;">
+                <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">ESTIMATED OPERATIONAL FINANCIAL SAVINGS</div>
+                <div style="color: #16a34a; font-size: 28px; font-weight: 800;">₹{cost_saved:,.2f}</div>
+                <hr style="border-color: #e2e8f0; margin: 10px 0;">
+                <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">ADDITIONAL PATIENT INTAKE CAPACITY</div>
+                <div style="color: #d97706; font-size: 22px; font-weight: 800;">+{extra_capacity:,} Patients</div>
             </div>
         """, unsafe_allow_html=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
 st.sidebar.markdown("---")
-st.sidebar.caption("⚡ MediPulse Enterprise Command | Group 1 Decision Analytics")
+st.sidebar.caption("🏥 MediPulse Hospital Analytics | Group 1")
