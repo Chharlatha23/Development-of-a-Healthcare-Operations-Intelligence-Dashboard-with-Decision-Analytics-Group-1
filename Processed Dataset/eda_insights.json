@@ -6,148 +6,152 @@
         "total_insurance_inr": 432894031.0,
         "total_patient_paid_inr": 431571887.0,
         "total_outstanding_inr": 146278381.0,
+        "estimated_collected_inr": 718187537.0,
+        "collection_rate_pct": 83.08,
         "avg_age": 48.1,
-        "avg_los_days": 11.96,
-        "emergency_rate_pct": 49.87
+        "avg_los_days": 12.14,
+        "emergency_admissions": 6517,
+        "emergency_rate_pct": 49.87,
+        "incomplete_final_month_excluded": "2026-06"
     },
     "department_kpis": [
         {
             "Department": "Cardiology",
             "admissions": 643,
-            "avg_los": 11.06,
+            "avg_los": 11.17,
             "total_revenue": 41169680,
             "avg_bill": 64027.5
         },
         {
             "Department": "Dermatology",
             "admissions": 648,
-            "avg_los": 10.26,
+            "avg_los": 10.4,
             "total_revenue": 44519328,
             "avg_bill": 68702.67
         },
         {
             "Department": "Emergency",
             "admissions": 656,
-            "avg_los": 11.88,
+            "avg_los": 12.03,
             "total_revenue": 42438254,
             "avg_bill": 64692.46
         },
         {
             "Department": "Endocrinology",
             "admissions": 658,
-            "avg_los": 12.69,
+            "avg_los": 12.91,
             "total_revenue": 43251048,
             "avg_bill": 65731.08
         },
         {
             "Department": "Ent",
             "admissions": 613,
-            "avg_los": 9.47,
+            "avg_los": 9.57,
             "total_revenue": 41043562,
             "avg_bill": 66955.24
         },
         {
             "Department": "Gastroenterology",
             "admissions": 656,
-            "avg_los": 11.42,
+            "avg_los": 11.63,
             "total_revenue": 41987042,
             "avg_bill": 64004.64
         },
         {
             "Department": "General Medicine",
             "admissions": 631,
-            "avg_los": 14.5,
+            "avg_los": 14.67,
             "total_revenue": 38996191,
             "avg_bill": 61800.62
         },
         {
             "Department": "Gynecology",
             "admissions": 683,
-            "avg_los": 11.42,
+            "avg_los": 11.62,
             "total_revenue": 44430784,
             "avg_bill": 65052.39
         },
         {
             "Department": "Icu",
             "admissions": 659,
-            "avg_los": 13.19,
+            "avg_los": 13.48,
             "total_revenue": 43015189,
             "avg_bill": 65273.43
         },
         {
             "Department": "Nephrology",
             "admissions": 680,
-            "avg_los": 10.16,
+            "avg_los": 10.31,
             "total_revenue": 46552599,
             "avg_bill": 68459.7
         },
         {
             "Department": "Neurology",
             "admissions": 669,
-            "avg_los": 10.83,
+            "avg_los": 10.94,
             "total_revenue": 43869473,
             "avg_bill": 65574.7
         },
         {
             "Department": "Oncology",
             "admissions": 653,
-            "avg_los": 10.5,
+            "avg_los": 10.76,
             "total_revenue": 43642448,
             "avg_bill": 66833.76
         },
         {
             "Department": "Ophthalmology",
             "admissions": 644,
-            "avg_los": 8.97,
+            "avg_los": 9.01,
             "total_revenue": 44621902,
             "avg_bill": 69288.67
         },
         {
             "Department": "Orthopedics",
             "admissions": 683,
-            "avg_los": 12.03,
+            "avg_los": 12.16,
             "total_revenue": 43152416,
             "avg_bill": 63180.7
         },
         {
             "Department": "Pathology",
             "admissions": 668,
-            "avg_los": 13.31,
+            "avg_los": 13.54,
             "total_revenue": 42249858,
             "avg_bill": 63248.29
         },
         {
             "Department": "Pediatrics",
             "admissions": 681,
-            "avg_los": 13.94,
+            "avg_los": 14.11,
             "total_revenue": 45754864,
             "avg_bill": 67187.76
         },
         {
             "Department": "Psychiatry",
             "admissions": 634,
-            "avg_los": 12.1,
+            "avg_los": 12.24,
             "total_revenue": 45450186,
             "avg_bill": 71687.99
         },
         {
             "Department": "Pulmonology",
             "admissions": 672,
-            "avg_los": 12.77,
+            "avg_los": 13.07,
             "total_revenue": 44461105,
             "avg_bill": 66162.36
         },
         {
             "Department": "Radiology",
             "admissions": 606,
-            "avg_los": 14.93,
+            "avg_los": 15.07,
             "total_revenue": 42357673,
             "avg_bill": 69897.15
         },
         {
             "Department": "Urology",
             "admissions": 632,
-            "avg_los": 13.96,
+            "avg_los": 14.19,
             "total_revenue": 41502316,
             "avg_bill": 65668.22
         }
@@ -367,11 +371,6 @@
             "Month_Year": "2026-05",
             "admissions": 460,
             "revenue": 30930129
-        },
-        {
-            "Month_Year": "2026-06",
-            "admissions": 255,
-            "revenue": 17110705
         }
     ]
 }

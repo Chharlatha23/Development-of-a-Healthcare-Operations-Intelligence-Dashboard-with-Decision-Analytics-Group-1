@@ -36,9 +36,11 @@ def clean_data():
             df_cleaned[col] = pd.to_datetime(df_cleaned[col], errors='coerce')
             
     # Calculate Length of Stay (LOS) in days
+    # Records where Discharge_Date < Admission_Date are invalid and set to NaN.
+    # They are NOT silently coerced to 1 day, so LOS averages remain unbiased.
     if 'Admission_Date' in df_cleaned.columns and 'Discharge_Date' in df_cleaned.columns:
-        df_cleaned['Length_of_Stay_Days'] = (df_cleaned['Discharge_Date'] - df_cleaned['Admission_Date']).dt.days
-        df_cleaned['Length_of_Stay_Days'] = df_cleaned['Length_of_Stay_Days'].apply(lambda x: x if x > 0 else 1)
+        raw_los = (df_cleaned['Discharge_Date'] - df_cleaned['Admission_Date']).dt.days
+        df_cleaned['Length_of_Stay_Days'] = raw_los.where(raw_los > 0, other=pd.NA)
         
     # 3. Financial Derivations & Calculations
     if 'Total_Amount' in df_cleaned.columns and 'Insurance_Cover' in df_cleaned.columns:
