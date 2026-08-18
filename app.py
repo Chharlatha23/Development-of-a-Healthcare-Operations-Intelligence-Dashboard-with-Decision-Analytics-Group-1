@@ -390,7 +390,7 @@ if selected_view == "Executive Overview":
             <div class="hospital-kpi-card">
                 <div class="kpi-card-label">Average Length of Stay</div>
                 <div class="kpi-card-value">{f_df['Length_of_Stay_Days'].mean():.1f} <span style="font-size:13px; font-weight:600;">Days</span></div>
-                <div class="kpi-card-sub">⏱️ Bed Turnaround Ratio</div>
+                <div class="kpi-card-sub">⏱️ Average Hospital Stay</div>
             </div>
         """, unsafe_allow_html=True)
     with k4:
@@ -455,7 +455,7 @@ if selected_view == "Executive Overview":
         
         fig_monthly = px.area(
             complete_monthly_df, x='Month_Year', y='Admission_ID',
-            labels={'Admission_ID': 'Admissions'}, color_discrete_sequence=['#0284c7']
+            labels={'Admission_ID': 'Admissions', 'Month_Year': 'Admission Month'}, color_discrete_sequence=['#0284c7']
         )
         fig_monthly.update_layout(**PLOTLY_LIGHT_THEME, height=340, margin=dict(l=0, r=10, t=10, b=0))
         st.plotly_chart(fig_monthly, use_container_width=True)
@@ -556,7 +556,7 @@ elif selected_view == "Bed Capacity & Ward Analytics":
     with b4:
         st.markdown(f"""
             <div class="hospital-kpi-card">
-                <div class="kpi-card-label">Most Utilized Room</div>
+                <div class="kpi-card-label">Most Common Room Type</div>
                 <div class="kpi-card-value">{top_room}</div>
                 <div class="kpi-card-sub">🚪 Preference Split</div>
             </div>
@@ -614,7 +614,7 @@ elif selected_view == "Bed Capacity & Ward Analytics":
     with i1:
         st.markdown(f'<div class="insight-item"><div class="insight-title">🏨 Highest Ward Volume</div><div class="insight-val">{top_ward}</div></div>', unsafe_allow_html=True)
     with i2:
-        st.markdown(f'<div class="insight-item"><div class="insight-title">🚨 Intensive Care Occupants</div><div class="insight-val">{icu_count:,}</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🚨 Intensive Care Admissions</div><div class="insight-val">{icu_count:,}</div></div>', unsafe_allow_html=True)
     with i3:
         st.markdown(f'<div class="insight-item"><div class="insight-title">🚪 Primary Accommodation</div><div class="insight-val">{top_room}</div></div>', unsafe_allow_html=True)
     with i4:
@@ -655,7 +655,7 @@ elif selected_view == "Patient Flow":
             <div class="hospital-kpi-card hospital-kpi-card-teal">
                 <div class="kpi-card-label">Average Length of Stay</div>
                 <div class="kpi-card-value">{f_df['Length_of_Stay_Days'].mean():.1f} Days</div>
-                <div class="kpi-card-sub">⏱️ Turnaround Duration</div>
+                <div class="kpi-card-sub">⏱️ Average Hospital Stay</div>
             </div>
         """, unsafe_allow_html=True)
     with p3:
@@ -682,7 +682,7 @@ elif selected_view == "Patient Flow":
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
         st.markdown("<div class='chart-card-title'><span>📈 Patient Volume Flow Over Time</span><span style='font-size:11px; color:#64748b;'>Complete Months</span></div>", unsafe_allow_html=True)
         monthly_flow_df = complete_monthly.groupby('Month_Year')['Admission_ID'].count().reset_index()
-        fig_flow = px.line(monthly_flow_df, x='Month_Year', y='Admission_ID', markers=True, color_discrete_sequence=['#0284c7'])
+        fig_flow = px.line(monthly_flow_df, x='Month_Year', y='Admission_ID', markers=True, color_discrete_sequence=['#0284c7'], labels={'Admission_ID': 'Admissions', 'Month_Year': 'Admission Month'})
         fig_flow.update_layout(**PLOTLY_LIGHT_THEME, height=340)
         st.plotly_chart(fig_flow, use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
@@ -746,7 +746,7 @@ elif selected_view == "Revenue & Dues":
             <div class="hospital-kpi-card">
                 <div class="kpi-card-label">Estimated Collected Amount</div>
                 <div class="kpi-card-value">₹{collected_amount/1e6:.1f}M</div>
-                <div class="kpi-card-sub">💵 Out-of-Pocket Payments</div>
+                <div class="kpi-card-sub">💵 Estimated Amount Collected</div>
             </div>
         """, unsafe_allow_html=True)
     with f4:
@@ -771,7 +771,7 @@ elif selected_view == "Revenue & Dues":
     c1, c2 = st.columns(2)
     with c1:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='chart-card-title'><span>💳 Payment Settlement Lifecycle</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>💳 Payment Status Distribution</span></div>", unsafe_allow_html=True)
         pay_df = f_df['Payment_Status'].value_counts().reset_index()
         pay_df.columns = ['Status', 'Count']
         fig_pay = px.pie(
@@ -941,7 +941,7 @@ elif selected_view == "Emergency Analytics":
             <div class="hospital-kpi-card">
                 <div class="kpi-card-label">Average Emergency Stay</div>
                 <div class="kpi-card-value">{avg_er_los:.1f} Days</div>
-                <div class="kpi-card-sub">⏱️ Inpatient ER Turnaround</div>
+                <div class="kpi-card-sub">⏱️ Avg LOS for Emergency Admissions</div>
             </div>
         """, unsafe_allow_html=True)
     with e4:
@@ -1019,7 +1019,7 @@ elif selected_view == "Length-of-Stay Reduction Simulator":
                 <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">ESTIMATED OPERATIONAL FINANCIAL SAVINGS</div>
                 <div style="color: #16a34a; font-size: 26px; font-weight: 800;">₹{cost_saved:,.2f}</div>
                 <hr style="border-color: #e2e8f0; margin: 8px 0;">
-                <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">ADDITIONAL PATIENT INTAKE CAPACITY</div>
+                <div style="color: #475569; font-size: 11px; font-weight: 700; text-transform: uppercase;">ESTIMATED ADDITIONAL ADMISSION CAPACITY</div>
                 <div style="color: #d97706; font-size: 20px; font-weight: 800;">+{extra_capacity:,} Patients</div>
             </div>
         """, unsafe_allow_html=True)
