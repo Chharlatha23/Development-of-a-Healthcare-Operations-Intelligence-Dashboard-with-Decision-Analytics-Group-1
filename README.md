@@ -3,7 +3,7 @@
 Welcome to the official repository for **Development of a Healthcare Operations Intelligence Dashboard with Decision Analytics (Group 1)**.
 
 ## 📌 Project Overview
-This project presents an end-to-end Healthcare Operations Intelligence & Decision Analytics solution. It processes raw hospital admission logs, performs automated data cleaning and feature engineering, computes key performance metrics, and serves an interactive 5-page decision analytics dashboard built with **Streamlit** and **Plotly**.
+This project presents an end-to-end Healthcare Operations Intelligence & Decision Analytics solution. It processes raw hospital admission logs, performs automated data cleaning and feature engineering, computes key performance metrics, and serves a modern hospital operations and healthcare analytics dashboard built with Streamlit and Plotly.
 
 ---
 
@@ -28,13 +28,15 @@ Key metrics computed from the dataset:
 - **Emergency Admission Ratio:** `49.87%` emergency vs `50.13%` elective.
 - **Department Load:** 20 distinct departments led by Gynecology, Orthopedics, Pediatrics, Nephrology, and Pulmonology.
 
-### Step 4 & 5: Interactive 5-Page Dashboard (`app.py`)
-Built an interactive multi-page dashboard featuring Plotly dark-themed visualizations:
-1. **Executive Overview & KPIs:** Real-time metrics cards, department load bar chart, monthly admission trends.
-2. **Clinical & Bed Capacity:** Ward occupancy doughnut chart, room type distribution, average LOS by specialty.
-3. **Financial & Revenue Analytics:** Payment status breakdown, departmental revenue contribution, outstanding recovery.
-4. **Patient & Diagnostic Insights:** Top 10 clinical diagnoses, medication prescription demand, demographic age distribution.
-5. **Operational Decision Simulator:** Interactive slider tool allowing hospital executives to simulate Length of Stay (LOS) reduction scenarios and calculate potential bed-days saved & cost efficiencies.
+### Step 4 & 5: Interactive 7-Page Dashboard (`app.py`)
+A modern hospital operations and healthcare analytics dashboard built with Streamlit and Plotly, featuring a clean, WCAG-accessible light hospital theme:
+1. **Executive Overview**: High-level metrics, department loads, and dynamic executive insights.
+2. **Bed Capacity & Ward Analytics**: Ward utilization, room types, ICU metrics, and capacity insights.
+3. **Patient Flow**: Admission tracking, flow rates, and turnaround metrics.
+4. **Revenue & Dues**: Billed revenue, insurance coverage, patient out-of-pocket, and outstanding dues tracking.
+5. **Diagnostic Labs & Pharmacy**: Diagnosis records, prescription volumes, and identified conditions.
+6. **Emergency Analytics**: Emergency admission rates, critical intake ratios, and ER-specific metrics.
+7. **Length-of-Stay Reduction Simulator**: An interactive decision simulator (NOT an ML prediction model) that allows hospital executives to simulate what-if operational scenarios to calculate potential bed-days saved and cost efficiencies.
 
 ---
 
@@ -72,6 +74,17 @@ Built an interactive multi-page dashboard featuring Plotly dark-themed visualiza
 ├── app.py                         # Interactive Streamlit & Plotly Dashboard
 └── README.md                      # Complete project guide and documentation
 ```
+
+---
+
+## Data & Analytical Assumptions
+
+* **Emergency Rate**: Based on the Emergency admission status field.
+* **Length of Stay (LOS)**: Calculated from admission/discharge dates where available.
+* **Incomplete Final Months**: Automatically excluded from monthly trend analysis to prevent skewed flow metrics.
+* **Bed & Ward Metrics**: Based on admission records. These are not equivalent to real-time bed occupancy metrics as actual total capacity fields are not present.
+* **LOS Simulator**: Represents what-if operational scenarios to estimate capacity impact. It is *not* a machine learning prediction model.
+* **Financial Metrics**: Derived directly from available billing/payment fields and evaluated against Payment Status to prevent logical contradictions.
 
 ---
 *Developed by Group 1 for Infosys Healthcare Operations Intelligence Project.*

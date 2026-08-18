@@ -294,7 +294,7 @@ NAV_OPTIONS = [
     "Revenue & Dues",
     "Diagnostic Labs & Pharmacy",
     "Emergency Analytics",
-    "Length-of-Stay Prediction"
+    "Length-of-Stay Reduction Simulator"
 ]
 
 if "selected_view" not in st.session_state:
@@ -395,15 +395,15 @@ if selected_view == "Executive Overview":
     with k4:
         st.markdown(f"""
             <div class="hospital-kpi-card hospital-kpi-card-rose">
-                <div class="kpi-card-label">Emergency Critical Rate</div>
+                <div class="kpi-card-label">Emergency Admission Rate</div>
                 <div class="kpi-card-value kpi-card-value-rose">{(f_df['Emergency'].value_counts().get('Yes', 0)/len(f_df)*100 if len(f_df)>0 else 0):.1f}%</div>
-                <div class="kpi-card-sub">🚑 {f_df['Emergency'].value_counts().get('Yes', 0):,} ER Cases</div>
+                <div class="kpi-card-sub">🚑 {f_df['Emergency'].value_counts().get('Yes', 0):,} Emergency Cases</div>
             </div>
         """, unsafe_allow_html=True)
     with k5:
         st.markdown(f"""
             <div class="hospital-kpi-card hospital-kpi-card-amber">
-                <div class="kpi-card-label">Pending Recovery</div>
+                <div class="kpi-card-label">Outstanding Dues</div>
                 <div class="kpi-card-value">₹{f_df['Outstanding_Balance'].sum()/1e6:.1f}M</div>
                 <div class="kpi-card-sub">⚠️ Uncollected Dues</div>
             </div>
@@ -446,8 +446,11 @@ if selected_view == "Executive Overview":
         st.markdown("<div class='chart-card-title'><span>📈 Monthly Inpatient Admission Trend</span><span style='font-size:12px; color:#64748b;'>Volume Trends</span></div>", unsafe_allow_html=True)
         f_df['Month_Year'] = f_df['Admission_Date'].dt.to_period('M').astype(str)
         
-        # Exclude incomplete final month (2026-06) for accurate trend representation
-        complete_monthly_df = f_df[f_df['Month_Year'] != '2026-06'].groupby('Month_Year')['Admission_ID'].count().reset_index()
+        # Exclude incomplete final month dynamically for accurate trend representation
+        max_date = f_df['Admission_Date'].max()
+        import calendar
+        is_complete = (max_date.day == calendar.monthrange(max_date.year, max_date.month)[1]) if pd.notna(max_date) else True
+        complete_monthly_df = f_df[f_df['Month_Year'] != max_date.strftime('%Y-%m')].groupby('Month_Year')['Admission_ID'].count().reset_index() if not is_complete else f_df.groupby('Month_Year')['Admission_ID'].count().reset_index()
         
         fig_monthly = px.area(
             complete_monthly_df, x='Month_Year', y='Admission_ID',
@@ -458,7 +461,12 @@ if selected_view == "Executive Overview":
         st.markdown("</div>", unsafe_allow_html=True)
 
     # DYNAMIC KEY INSIGHTS SECTION
-    top_dept_name = dept_counts.iloc[0]['Department'] if len(dept_counts) > 0 else "N/A"
+    if len(dept_counts) > 0:
+        max_admissions = dept_counts['Admissions'].max()
+        top_depts = dept_counts[dept_counts['Admissions'] == max_admissions]['Department'].tolist()
+        top_dept_name = " & ".join(top_depts)
+    else:
+        top_dept_name = "N/A"
     avg_monthly_adm = round(complete_monthly_df['Admission_ID'].mean(), 1) if len(complete_monthly_df) > 0 else 0
     er_rate_val = (f_df['Emergency'].value_counts().get('Yes', 0)/len(f_df)*100 if len(f_df)>0 else 0)
     avg_los_val = f_df['Length_of_Stay_Days'].mean() if len(f_df)>0 else 0
@@ -485,7 +493,7 @@ if selected_view == "Executive Overview":
     with i3:
         st.markdown(f"""
             <div class="insight-item">
-                <div class="insight-title">🚑 Critical ER Rate</div>
+                <div class="insight-title">🚑 Emergency Admission Rate</div>
                 <div class="insight-val">{er_rate_val:.1f}%</div>
             </div>
         """, unsafe_allow_html=True)
@@ -523,7 +531,7 @@ elif selected_view == "Bed Capacity & Ward Analytics":
     with b1:
         st.markdown(f"""
             <div class="hospital-kpi-card">
-                <div class="kpi-card-label">Active Tracked Beds</div>
+                <div class="kpi-card-label">Unique Beds in Records</div>
                 <div class="kpi-card-value">{total_beds:,}</div>
                 <div class="kpi-card-sub">🛏️ Unique Bed IDs</div>
             </div>
@@ -531,7 +539,7 @@ elif selected_view == "Bed Capacity & Ward Analytics":
     with b2:
         st.markdown(f"""
             <div class="hospital-kpi-card hospital-kpi-card-teal">
-                <div class="kpi-card-label">Highest Occupancy Ward</div>
+                <div class="kpi-card-label">Highest Admission-Volume Ward</div>
                 <div class="kpi-card-value">{top_ward}</div>
                 <div class="kpi-card-sub">🏨 Peak Patient Load</div>
             </div>
@@ -539,9 +547,9 @@ elif selected_view == "Bed Capacity & Ward Analytics":
     with b3:
         st.markdown(f"""
             <div class="hospital-kpi-card hospital-kpi-card-rose">
-                <div class="kpi-card-label">ICU Ward Cases</div>
+                <div class="kpi-card-label">ICU Admissions</div>
                 <div class="kpi-card-value kpi-card-value-rose">{icu_count:,}</div>
-                <div class="kpi-card-sub">🚨 Intensive Care Occupancy</div>
+                <div class="kpi-card-sub">🚨 Intensive Care Admissions</div>
             </div>
         """, unsafe_allow_html=True)
     with b4:
@@ -566,7 +574,7 @@ elif selected_view == "Bed Capacity & Ward Analytics":
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
-        st.markdown("<div class='chart-card-title'><span>🏨 Ward Occupancy Breakdown</span></div>", unsafe_allow_html=True)
+        st.markdown("<div class='chart-card-title'><span>🏨 Ward Admission Volume</span></div>", unsafe_allow_html=True)
         ward_df = f_df['Ward'].value_counts().reset_index()
         ward_df.columns = ['Ward', 'Count']
         fig_ward = px.pie(
@@ -591,7 +599,7 @@ elif selected_view == "Bed Capacity & Ward Analytics":
         st.markdown("</div>", unsafe_allow_html=True)
 
     st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
-    st.markdown("<div class='chart-card-title'><span>🔥 Department vs. Ward Occupancy Matrix (Heatmap)</span></div>", unsafe_allow_html=True)
+    st.markdown("<div class='chart-card-title'><span>🔥 Department vs. Ward Admission Volume (Heatmap)</span></div>", unsafe_allow_html=True)
     heatmap_data = pd.crosstab(f_df['Department'], f_df['Ward'])
     fig_heat = px.imshow(heatmap_data, text_auto=True, aspect="auto", color_continuous_scale="Blues")
     fig_heat.update_layout(**PLOTLY_LIGHT_THEME, height=380)
@@ -619,11 +627,18 @@ elif selected_view == "Patient Flow":
     st.markdown("### Patient Flow Dashboard")
     
     f_df['Month_Year'] = f_df['Admission_Date'].dt.to_period('M').astype(str)
-    complete_monthly = f_df[f_df['Month_Year'] != '2026-06']
+    max_date = f_df['Admission_Date'].max()
+    import calendar
+    is_complete = (max_date.day == calendar.monthrange(max_date.year, max_date.month)[1]) if pd.notna(max_date) else True
+    complete_monthly = f_df[f_df['Month_Year'] != max_date.strftime('%Y-%m')] if not is_complete else f_df
     
     avg_monthly = round(complete_monthly.groupby('Month_Year')['Admission_ID'].count().mean(), 1) if len(complete_monthly) > 0 else 0
     top_flow_dept = f_df['Department'].value_counts().idxmax() if len(f_df) > 0 else "N/A"
-    avg_daily_intake = round(len(complete_monthly) / max(1, complete_monthly['Month_Year'].nunique() * 30), 1)
+    if len(complete_monthly) > 0:
+        date_range = (complete_monthly['Admission_Date'].max() - complete_monthly['Admission_Date'].min()).days + 1
+        avg_daily_intake = round(len(complete_monthly) / max(1, date_range), 1)
+    else:
+        avg_daily_intake = 0
     
     p1, p2, p3, p4 = st.columns(4)
     with p1:
@@ -703,9 +718,9 @@ elif selected_view == "Revenue & Dues":
     
     total_rev = f_df['Total_Amount'].sum() if len(f_df) > 0 else 0
     ins_cover = f_df['Insurance_Cover'].sum() if len(f_df) > 0 else 0
-    patient_paid = f_df['Patient_Paid'].sum() if len(f_df) > 0 else 0
     pending_dues = f_df['Outstanding_Balance'].sum() if len(f_df) > 0 else 0
-    settlement_rate = ((ins_cover + patient_paid) / max(1, total_rev) * 100)
+    collected_amount = max(0, total_rev - pending_dues) if len(f_df) > 0 else 0
+    settlement_rate = (collected_amount / max(1, total_rev)) * 100
     top_rev_dept = f_df.groupby('Department')['Total_Amount'].sum().idxmax() if len(f_df) > 0 else "N/A"
     
     f1, f2, f3, f4, f5 = st.columns(5)
@@ -728,8 +743,8 @@ elif selected_view == "Revenue & Dues":
     with f3:
         st.markdown(f"""
             <div class="hospital-kpi-card">
-                <div class="kpi-card-label">Patient Paid Amount</div>
-                <div class="kpi-card-value">₹{patient_paid/1e6:.1f}M</div>
+                <div class="kpi-card-label">Estimated Collected Amount</div>
+                <div class="kpi-card-value">₹{collected_amount/1e6:.1f}M</div>
                 <div class="kpi-card-sub">💵 Out-of-Pocket Payments</div>
             </div>
         """, unsafe_allow_html=True)
@@ -744,7 +759,7 @@ elif selected_view == "Revenue & Dues":
     with f5:
         st.markdown(f"""
             <div class="hospital-kpi-card hospital-kpi-card-teal">
-                <div class="kpi-card-label">Claim Settlement Rate</div>
+                <div class="kpi-card-label">Collection Rate</div>
                 <div class="kpi-card-value">{settlement_rate:.1f}%</div>
                 <div class="kpi-card-sub">✅ Revenue Recovery Ratio</div>
             </div>
@@ -810,7 +825,7 @@ elif selected_view == "Diagnostic Labs & Pharmacy":
             <div class="hospital-kpi-card">
                 <div class="kpi-card-label">Diagnostic Records</div>
                 <div class="kpi-card-value">{total_diag_records:,}</div>
-                <div class="kpi-card-sub">📋 Total Pathology Tests</div>
+                <div class="kpi-card-sub">📋 Diagnosis Records</div>
             </div>
         """, unsafe_allow_html=True)
     with d2:
@@ -909,7 +924,7 @@ elif selected_view == "Emergency Analytics":
             <div class="hospital-kpi-card hospital-kpi-card-rose">
                 <div class="kpi-card-label">Total Emergency Cases</div>
                 <div class="kpi-card-value kpi-card-value-rose">{total_er:,}</div>
-                <div class="kpi-card-sub">🚨 Critical Inpatient Volume</div>
+                <div class="kpi-card-sub">🚨 Emergency Inpatient Volume</div>
             </div>
         """, unsafe_allow_html=True)
     with e2:
@@ -917,7 +932,7 @@ elif selected_view == "Emergency Analytics":
             <div class="hospital-kpi-card hospital-kpi-card-rose">
                 <div class="kpi-card-label">Emergency Intake Ratio</div>
                 <div class="kpi-card-value kpi-card-value-rose">{er_ratio:.1f}%</div>
-                <div class="kpi-card-sub">🚑 Critical vs Elective Split</div>
+                <div class="kpi-card-sub">🚑 Emergency vs Elective Split</div>
             </div>
         """, unsafe_allow_html=True)
     with e3:
@@ -967,7 +982,7 @@ elif selected_view == "Emergency Analytics":
     with i1:
         st.markdown(f'<div class="insight-item"><div class="insight-title">🚨 Highest ER Department</div><div class="insight-val">{top_er_dept}</div></div>', unsafe_allow_html=True)
     with i2:
-        st.markdown(f'<div class="insight-item"><div class="insight-title">🚑 Critical Intake Rate</div><div class="insight-val">{er_ratio:.1f}%</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="insight-item"><div class="insight-title">🚑 Emergency Admission Rate</div><div class="insight-val">{er_ratio:.1f}%</div></div>', unsafe_allow_html=True)
     with i3:
         st.markdown(f'<div class="insight-item"><div class="insight-title">🏥 Emergency ICU Cases</div><div class="insight-val">{er_icu_cases:,}</div></div>', unsafe_allow_html=True)
     with i4:
@@ -977,9 +992,9 @@ elif selected_view == "Emergency Analytics":
 # ==========================================
 # 7. PREDICTIVE LENGTH-OF-STAY DASHBOARD
 # ==========================================
-elif selected_view == "Length-of-Stay Prediction":
-    st.markdown("### Predictive Length-of-Stay Dashboard")
-    st.markdown("<div style='font-size:13px; color:#475569; margin-bottom:15px;'>Simulate capacity optimization scenarios to project bed-days saved, operational cost reductions, and emergency throughput.</div>", unsafe_allow_html=True)
+elif selected_view == "Length-of-Stay Reduction Simulator":
+    st.markdown("### Length-of-Stay Reduction Simulator")
+    st.markdown("<div style='font-size:13px; color:#475569; margin-bottom:15px;'>Simulate length-of-stay reduction scenarios to estimate bed-days saved, operational cost savings, and additional admission capacity.</div>", unsafe_allow_html=True)
     
     st.markdown("<div class='chart-container-card'>", unsafe_allow_html=True)
     c1, c2 = st.columns(2)

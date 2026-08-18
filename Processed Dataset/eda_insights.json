@@ -5,7 +5,7 @@
         "total_revenue_inr": 864465918.0,
         "total_insurance_inr": 432894031.0,
         "total_patient_paid_inr": 431571887.0,
-        "total_outstanding_inr": 0.0,
+        "total_outstanding_inr": 146278381.0,
         "avg_age": 48.1,
         "avg_los_days": 11.96,
         "emergency_rate_pct": 49.87
@@ -172,7 +172,7 @@
             "count": 4378,
             "total_amount": 291805327,
             "patient_paid": 146278381,
-            "outstanding": 0.0
+            "outstanding": 146278381.0
         }
     ],
     "ward_occupancy": {
