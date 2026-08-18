@@ -249,6 +249,7 @@ st.markdown("""
 
 @st.cache_data
 def load_data():
+    # Cache busted to load new financial calculations
     path = "Processed Dataset/Admissions_cleaned.csv"
     if os.path.exists(path):
         df = pd.read_csv(path)
