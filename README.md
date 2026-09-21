@@ -7,6 +7,13 @@ This project presents an end-to-end Healthcare Operations Intelligence & Decisio
 
 ---
 
+## 🔗 Project Resources
+
+- **Live App:** [https://medipulse-analytics.streamlit.app/](https://medipulse-analytics.streamlit.app/)
+- **Dataset:** [Click here to view and download dataset from Google Drive](https://drive.google.com/drive/folders/1qs-H5jP_Th2OKH-452OmhltF2BkQyfCc?usp=sharing
+)
+---
+
 ## 🛠️ Step-by-Step Project Implementation
 
 ### Step 1: Understand & Clean the Dataset (`scripts/data_cleaning.py`)
