@@ -2,19 +2,30 @@
 
 Welcome to the official repository for **Development of a Healthcare Operations Intelligence Dashboard with Decision Analytics (Group 1)**.
 
-## 📌 Project Overview
+##  Project Overview
 This project presents an end-to-end Healthcare Operations Intelligence & Decision Analytics solution. It processes raw hospital admission logs, performs automated data cleaning and feature engineering, computes key performance metrics, and serves a modern hospital operations and healthcare analytics dashboard built with Streamlit and Plotly.
 
 ---
 
-## 🔗 Project Resources
+##  Project Resources
 
 - **Live App:** [https://medipulse-analytics.streamlit.app/](https://medipulse-analytics.streamlit.app/)
 - **Dataset:** [Click here to view and download dataset from Google Drive](https://drive.google.com/drive/folders/1qs-H5jP_Th2OKH-452OmhltF2BkQyfCc?usp=sharing
 )
+
 ---
 
-## 🛠️ Step-by-Step Project Implementation
+##  Problem Statement
+
+Healthcare organizations generate large amounts of operational data related to patient admissions, bed utilization, patient flow, billing, diagnostics, pharmacy services, emergency care, and length of stay. However, analyzing these data manually can make it difficult to identify operational patterns, resource utilization, financial gaps, and areas requiring attention.
+
+The objective of this project is to develop an interactive Healthcare Operations Intelligence Dashboard that transforms raw healthcare data into meaningful operational insights. The solution integrates data cleaning, exploratory analysis, key performance indicator calculation, interactive visualization, and decision analytics to support data-driven healthcare operational decision-making.
+
+The dashboard also includes a Length-of-Stay Reduction Simulator that enables users to perform what-if analysis and understand the potential operational impact of reducing patient length of stay.
+
+---
+
+##  Step-by-Step Project Implementation
 
 ### Step 1: Understand & Clean the Dataset (`scripts/data_cleaning.py`)
 - **Raw File:** `Raw Dataset/Admissions_filled.csv` (13,069 records, 52 columns).
@@ -47,7 +58,7 @@ A modern hospital operations and healthcare analytics dashboard built with Strea
 
 ---
 
-## 🚀 How to Run the Project Locally
+##  How to Run the Project Locally
 
 1. **Clone the Repository:**
    ```bash
@@ -68,7 +79,7 @@ A modern hospital operations and healthcare analytics dashboard built with Strea
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 ```
 ├── Processed Dataset/
 │   ├── Admissions_cleaned.csv     # Cleaned & feature-engineered dataset
